@@ -9,10 +9,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class MainTest {
     @Test
     public void testCarregarPropriedadesCSV() {
-        String fileName = "Madeira-Moodle-1.1.csv"; // Certifique-se de que o arquivo esteja no classpath
+        String fileName = "Madeira-Moodle-1.1.csv";
         List<PropriedadeRustica> propriedades = Main.carregarPropriedadesCSV(fileName);
 
         assertNotNull(propriedades);
-        assertFalse(propriedades.isEmpty()); // Verifica se há propriedades carregadas
+        assertFalse(propriedades.isEmpty());
     }
 }
