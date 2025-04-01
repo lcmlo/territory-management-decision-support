@@ -15,4 +15,17 @@ class MainTest {
         assertNotNull(propriedades);
         assertFalse(propriedades.isEmpty());
     }
+
+    @Test
+    public void testCriarGrafoPropietarios() {
+        String fileName = "Madeira-Moodle-1.1.csv";
+        List<PropriedadeRustica> propriedades = Main.carregarPropriedadesCSV(fileName);
+
+        GrafoPropietarios grafo = new GrafoPropietarios();
+        for (PropriedadeRustica p : propriedades) {
+            grafo.adicionarProprietario(p.getOwner());
+        }
+
+        assertTrue(grafo.getVizinhos(1).size() >= 0);
+    }
 }

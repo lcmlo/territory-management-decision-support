@@ -8,6 +8,10 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 
 /**
  * Classe principal para carregar propriedades rústicas de um arquivo CSV e exibi-las.
@@ -23,12 +27,75 @@ public class Main {
     public static void main(String[] args) {
         String fileName = "Madeira-Moodle-1.1.csv";
         List<PropriedadeRustica> propriedades = carregarPropriedadesCSV(fileName);
+        GrafoPropietarios grafo = new GrafoPropietarios();
 
         // Exibe as propriedades carregadas
         for (PropriedadeRustica propriedade : propriedades) {
             System.out.println(propriedade);
+            int owner = propriedade.getOwner();
+            grafo.adicionarProprietario(owner);
         }
+
+        int numThreads = Runtime.getRuntime().availableProcessors();
+        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+
+        for (int i = 0; i < propriedades.size(); i++) {
+            final int index = i;
+            executor.submit(() -> {
+                PropriedadeRustica p1 = propriedades.get(index);
+
+                for (int j = index + 1; j < propriedades.size(); j++) {
+                    PropriedadeRustica p2 = propriedades.get(j);
+
+                    if (saoAdjacentes(p1, p2)) {
+                        synchronized (grafo) { // 确保 grafo 的线程安全性
+                            grafo.adicionarVizinhanca(p1.getOwner(), p2.getOwner());
+                        }
+                    }
+                }
+            });
+        }
+
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        grafo.exibirGrafo();
     }
+    public static boolean saoAdjacentes(PropriedadeRustica p1, PropriedadeRustica p2) {
+        // 检查 Freguesia 和 Municipio 是否相同 (更严格)
+        if (!(p1.getFreguesia().equals(p2.getFreguesia()) && p1.getMunicipio().equals(p2.getMunicipio()))) {
+            return false; // 如果不同，直接返回 false
+        }
+
+        // 检查 PAR_ID 是否接近 (比如差值小于 10)
+        try {
+            long parId1 = Long.parseLong(p1.getParId());
+            long parId2 = Long.parseLong(p2.getParId());
+
+            if (Math.abs(parId1 - parId2) <= 5) { // 更严格地使用 5 而不是 10
+                return true;
+            }
+        } catch (NumberFormatException e) {
+            // 忽略无法转换为数字的情况
+        }
+
+        // 检查 PAR_NUM 是否接近 (限制范围更小)
+        double parNum1 = p1.getParNum();
+        double parNum2 = p2.getParNum();
+
+        if (Math.abs(parNum1 - parNum2) <= 1) { // 用 1 而不是 10，确保更精确
+            return true;
+        }
+
+        // 如果什么都没匹配上，就返回 false
+        return false;
+    }
+
+
 
     /**
      * Carrega as propriedades rústicas a partir de um arquivo CSV.
@@ -84,6 +151,7 @@ public class Main {
         } catch (IOException | CsvValidationException e) {
             e.printStackTrace();
         }
+
         return propriedades;
     }
 }
