@@ -28,6 +28,7 @@ public class GrafoPropietarios {
         return grafo.getOrDefault(owner, new HashSet<>());
     }
 
+
     // 🔥 添加这个方法
     public Map<Integer, Set<Integer>> getGrafo() {
         return this.grafo;

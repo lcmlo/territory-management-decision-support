@@ -12,6 +12,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.WKTReader;
+
 
 /**
  * Classe principal para carregar propriedades rústicas de um arquivo CSV e exibi-las.
@@ -26,6 +29,8 @@ public class Main {
      */
     public static void main(String[] args) {
         String fileName = "Madeira-Moodle-1.1.csv";
+        String fileName1 = "111.csv";//csv com menos dados
+
         List<PropriedadeRustica> propriedades = carregarPropriedadesCSV(fileName);
         GrafoPropietarios grafo = new GrafoPropietarios();
 
@@ -65,34 +70,25 @@ public class Main {
 
         grafo.exibirGrafo();
     }
+
     public static boolean saoAdjacentes(PropriedadeRustica p1, PropriedadeRustica p2) {
         // 检查 Freguesia 和 Municipio 是否相同 (更严格)
         if (!(p1.getFreguesia().equals(p2.getFreguesia()) && p1.getMunicipio().equals(p2.getMunicipio()))) {
             return false; // 如果不同，直接返回 false
         }
 
-        // 检查 PAR_ID 是否接近 (比如差值小于 10)
         try {
-            long parId1 = Long.parseLong(p1.getParId());
-            long parId2 = Long.parseLong(p2.getParId());
+            // 使用 WKTReader 来读取 WKT (Well-Known Text) 格式的 Geometry
+            WKTReader reader = new WKTReader();
+            Geometry geometry1 = reader.read(p1.getGeometry());
+            Geometry geometry2 = reader.read(p2.getGeometry());
 
-            if (Math.abs(parId1 - parId2) <= 5) { // 更严格地使用 5 而不是 10
-                return true;
-            }
-        } catch (NumberFormatException e) {
-            // 忽略无法转换为数字的情况
+            // 检查两个几何体是否相交
+            return geometry1.intersects(geometry2);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
-
-        // 检查 PAR_NUM 是否接近 (限制范围更小)
-        double parNum1 = p1.getParNum();
-        double parNum2 = p2.getParNum();
-
-        if (Math.abs(parNum1 - parNum2) <= 1) { // 用 1 而不是 10，确保更精确
-            return true;
-        }
-
-        // 如果什么都没匹配上，就返回 false
-        return false;
     }
 
 
