@@ -62,11 +62,11 @@ public class GrafoPropriedades {
     }
 
     /**
-     * Diz se duas propriedades são adjacentes ou não
+     *
      *
      * @param a uma propriedade
      * @param b uma propriedade
-     * @return
+     * @return Se duas propriedades são adjacentes ou não
      */
     public boolean adjacentes(PropriedadeRustica a, PropriedadeRustica b) {
         return grafoPropriedades.get(a).contains(b);
