@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Classe em que se representa o Grafo de adjacência de propriedades
  */
 public class GrafoPropriedades {
-    private Map<PropriedadeRustica, Set<PropriedadeRustica>> grafoPropriedades;
+    private static Map<PropriedadeRustica, Set<PropriedadeRustica>> grafoPropriedades;
     private STRtree index;
     private Map<PropriedadeRustica, Geometry> geometriaMap;
 
@@ -68,7 +68,7 @@ public class GrafoPropriedades {
      * @param b uma propriedade
      * @return Se duas propriedades são adjacentes ou não
      */
-    public boolean adjacentes(PropriedadeRustica a, PropriedadeRustica b) {
+    public static boolean adjacentes(PropriedadeRustica a, PropriedadeRustica b) {
         return grafoPropriedades.get(a).contains(b);
     }
 

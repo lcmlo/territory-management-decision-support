@@ -31,7 +31,7 @@ public class GrafoPropietariosTest {
                 PropriedadeRustica p1 = propriedades.get(i);
                 PropriedadeRustica p2 = propriedades.get(j);
 
-                if (Main.saoAdjacentes(p1, p2)) {
+                if (GrafoPropriedades.adjacentes(p1, p2)) {
                     grafo.adicionarVizinhanca(p1.getOwner(), p2.getOwner());
                 }
             }

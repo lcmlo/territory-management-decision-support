@@ -1,9 +1,6 @@
 package iscteiul.ista;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class GrafoPropietarios {
 
@@ -29,7 +26,6 @@ public class GrafoPropietarios {
     }
 
 
-    // 🔥 添加这个方法
     public Map<Integer, Set<Integer>> getGrafo() {
         return this.grafo;
     }
@@ -39,4 +35,28 @@ public class GrafoPropietarios {
             System.out.println("Proprietário: " + entry.getKey() + " -> Vizinhos: " + entry.getValue());
         }
     }
+    public static GrafoPropietarios construirGrafoProprietarios(List<PropriedadeRustica> propriedades) {
+        GrafoPropietarios grafoProprietarios = new GrafoPropietarios();
+
+        // 初始化所有业主
+        for (PropriedadeRustica propriedade : propriedades) {
+            grafoProprietarios.adicionarProprietario(propriedade.getOwner());
+        }
+
+        // 对所有成对的地块进行比较
+        for (int i = 0; i < propriedades.size(); i++) {
+            PropriedadeRustica p1 = propriedades.get(i);
+
+            for (int j = i + 1; j < propriedades.size(); j++) {
+                PropriedadeRustica p2 = propriedades.get(j);
+
+                if (p1.getOwner() != p2.getOwner() && GrafoPropriedades.adjacentes(p1, p2)) {
+                    grafoProprietarios.adicionarVizinhanca(p1.getOwner(), p2.getOwner());
+                }
+            }
+        }
+
+        return grafoProprietarios;
+    }
+
 }
