@@ -1,5 +1,8 @@
 package iscteiul.ista;
 
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.WKTReader;
+
 import java.util.*;
 
 public class GrafoPropietarios {
@@ -50,13 +53,37 @@ public class GrafoPropietarios {
             for (int j = i + 1; j < propriedades.size(); j++) {
                 PropriedadeRustica p2 = propriedades.get(j);
 
-                if (p1.getOwner() != p2.getOwner() && GrafoPropriedades.adjacentes(p1, p2)) {
+                //if (p1.getOwner() != p2.getOwner() && GrafoPropriedades.adjacentes(p1, p2)) {
+                //    grafoProprietarios.adicionarVizinhanca(p1.getOwner(), p2.getOwner());
+                //}
+                if (p1.getOwner() != p2.getOwner() && saoAdjacentes(p1, p2)) {
                     grafoProprietarios.adicionarVizinhanca(p1.getOwner(), p2.getOwner());
+
                 }
             }
         }
 
+
         return grafoProprietarios;
     }
+    private static boolean saoAdjacentes(PropriedadeRustica p1, PropriedadeRustica p2) {
+        // 检查是否在相同的 Freguesia 和 Municipio
+        if (!(p1.getFreguesia().equals(p2.getFreguesia()) &&
+                p1.getMunicipio().equals(p2.getMunicipio()))) {
+            return false;
+        }
+
+        try {
+            WKTReader reader = new WKTReader();
+            Geometry geometry1 = reader.read(p1.getGeometry());
+            Geometry geometry2 = reader.read(p2.getGeometry());
+
+            return geometry1.intersects(geometry2); // 使用 intersects 更强关系判断
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
 }
