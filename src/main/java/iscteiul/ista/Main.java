@@ -8,6 +8,9 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -24,18 +27,54 @@ public class Main {
     public static void main(String[] args) {
         String fileName = "Madeira-Moodle-1.1.csv";
         List<PropriedadeRustica> propriedades = carregarPropriedadesCSV(fileName);
-        GrafoPropriedades grafo = new GrafoPropriedades();
+        GrafoPropriedades grafoVizinhanca = new GrafoPropriedades();
 
         // Adicionar as propriedades ao grafo
         for (PropriedadeRustica p : propriedades) {
-            grafo.adicionarPropriedade(p);
+            grafoVizinhanca.adicionarPropriedade(p);
         }
 
         // Adicionar adjacências entre as propriedades
-        grafo.construirAdjacencias();
+        grafoVizinhanca.construirAdjacencias();
 
         // Mostrar o grafo no final
-        grafo.mostrarGrafo();
+        grafoVizinhanca.mostrarGrafo();
+
+        GrafoPropietarios grafoPropietarios = new GrafoPropietarios();
+
+        for (PropriedadeRustica propriedade : propriedades) {
+            System.out.println(propriedade);
+            int owner = propriedade.getOwner();
+            grafoPropietarios.adicionarProprietario(owner);
+        }
+
+        int numThreads = Runtime.getRuntime().availableProcessors();
+        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+
+        for (int i = 0; i < propriedades.size(); i++) {
+            final int index = i;
+            executor.submit(() -> {
+                        PropriedadeRustica p1 = propriedades.get(index);
+
+                        for (int j = index + 1; j < propriedades.size(); j++) {
+                            PropriedadeRustica p2 = propriedades.get(j);
+
+                            if (grafoVizinhanca.adjacentes(p1, p2)) {
+                                synchronized (grafoPropietarios) { // 确保 grafo 的线程安全性
+                                    grafoPropietarios.adicionarVizinhanca(p1.getOwner(), p2.getOwner());
+                                    executor.shutdown();
+                                    try {
+                                        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    grafoPropietarios.exibirGrafo();
+                                }
+                            }
+                        }
+                    });
+        }
     }
 
 
