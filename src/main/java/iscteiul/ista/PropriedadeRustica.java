@@ -1,5 +1,7 @@
 package iscteiul.ista;
 
+import org.locationtech.jts.geom.Geometry;
+
 /**
  * Representa uma propriedade rústica com informações como ID, área, coordenadas e localização.
  */
@@ -14,6 +16,17 @@ public class PropriedadeRustica {
     private String freguesia;
     private String municipio;
     private String ilha;
+    private Geometry geometryObj;
+
+
+    public Geometry getGeometryObj() {
+        return geometryObj;
+    }
+
+    public void setGeometryObj(Geometry geometryObj) {
+        this.geometryObj = geometryObj;
+    }
+
 
     /**
      * Define o ID único da propriedade.
