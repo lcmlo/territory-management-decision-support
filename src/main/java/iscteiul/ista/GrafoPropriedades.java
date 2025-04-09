@@ -6,76 +6,7 @@ import org.locationtech.jts.io.WKTReader;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-//public class GrafoPropriedades {
-//    private Map<PropriedadeRustica, Set<PropriedadeRustica>> grafoPropriedades;
-//    private STRtree index = new STRtree();
-//    private Map<PropriedadeRustica, Geometry> geometriaMap = new HashMap<>();
-//
-//    public GrafoPropriedades() {
-//        grafoPropriedades = new ConcurrentHashMap<>();
-//    }
-//
-//    public void adicionarPropriedade(PropriedadeRustica propriedade) {
-//        try {
-//            WKTReader reader = new WKTReader();
-//            Geometry geometry = reader.read(propriedade.getGeometry());
-//
-//            geometriaMap.put(propriedade, geometry);
-//            index.insert(geometry.getEnvelopeInternal(), propriedade);
-//
-//            grafoPropriedades.putIfAbsent(propriedade, new HashSet<>());
-//        } catch (Exception e) {
-//            System.err.println("Erro ao ler geometria da propriedade " + propriedade.getObjectId());
-//        }
-//    }
-//
-//    public void construirAdjacencias() {
-//        index.build(); // Garante que a árvore está pronta para uso
-//
-//        for (PropriedadeRustica propriedade : grafoPropriedades.keySet()) {
-//            Geometry geomA = geometriaMap.get(propriedade);
-//            List<?> candidatos = index.query(geomA.getEnvelopeInternal());
-//
-//            for (Object obj : candidatos) {
-//                PropriedadeRustica vizinho = (PropriedadeRustica) obj;
-//                if (!propriedade.equals(vizinho)) {
-//                    Geometry geomB = geometriaMap.get(vizinho);
-//
-//                    if (geomA.touches(geomB) || geomB.intersects(geomA)) {
-//                        grafoPropriedades.get(propriedade).add(vizinho);
-//                        grafoPropriedades.get(vizinho).add(propriedade);
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    public boolean adjacentes(PropriedadeRustica a, PropriedadeRustica b) {
-//        return grafoPropriedades.get(a).contains(b);
-//    }
-//
-//    public void mostrarGrafo() {
-//        System.out.println("Grafo de Adjacência das Propriedades Rústicas:");
-//        for (PropriedadeRustica propriedade : grafoPropriedades.keySet()) {
-//            System.out.print("Propriedade " + propriedade.getObjectId() + " -> [");
-//
-//            Set<PropriedadeRustica> adjacentes = grafoPropriedades.get(propriedade);
-//            String adjIds = adjacentes.stream()
-//                    .map(PropriedadeRustica::getObjectId)
-//                    .reduce((a, b) -> a + ", " + b)
-//                    .orElse("");
-//
-//            System.out.println(adjIds + "]");
-//        }
-//    }
-//
-//
-//
-//}
 
 /**
  * Classe em que se representa o Grafo de adjacência de propriedades
@@ -174,6 +105,10 @@ public class GrafoPropriedades {
 
             System.out.println(adjIds + "]");
         }
+    }
+    
+    public Map<PropriedadeRustica, Set<PropriedadeRustica>> getGrafo() {
+        return grafoPropriedades;
     }
 
 }
