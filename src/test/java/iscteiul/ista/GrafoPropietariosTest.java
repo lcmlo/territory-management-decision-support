@@ -11,27 +11,28 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GrafoPropietariosTest {
 
     private GrafoPropietarios grafo;
+    private GrafoPropriedades grafoAdj;
     private List<PropriedadeRustica> propriedades;
 
     @BeforeEach
     public void setUp() {
         grafo = new GrafoPropietarios();
-
-        // 你在 Main 类中应该已经实现了 carregarPropriedadesCSV 方法
+        grafoAdj = new GrafoPropriedades();
         propriedades = Main.carregarPropriedadesCSV("Madeira-Moodle-1.1.csv");
 
-        // 添加所有者节点
         for (PropriedadeRustica propriedade : propriedades) {
             grafo.adicionarProprietario(propriedade.getOwner());
+            grafoAdj.adicionarPropriedade(propriedade);
         }
 
-        // 添加邻接关系
+        grafoAdj.construirAdjacencias();
+
         for (int i = 0; i < propriedades.size(); i++) {
             for (int j = i + 1; j < propriedades.size(); j++) {
                 PropriedadeRustica p1 = propriedades.get(i);
                 PropriedadeRustica p2 = propriedades.get(j);
 
-                if (Main.saoAdjacentes(p1, p2)) {
+                if (GrafoPropriedades.adjacentes(p1, p2)) {
                     grafo.adicionarVizinhanca(p1.getOwner(), p2.getOwner());
                 }
             }
