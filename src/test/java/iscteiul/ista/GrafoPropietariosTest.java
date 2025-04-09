@@ -11,17 +11,21 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GrafoPropietariosTest {
 
     private GrafoPropietarios grafo;
+    private GrafoPropriedades grafoAdj;
     private List<PropriedadeRustica> propriedades;
 
     @BeforeEach
     public void setUp() {
         grafo = new GrafoPropietarios();
-
+        grafoAdj = new GrafoPropriedades();
         propriedades = Main.carregarPropriedadesCSV("Madeira-Moodle-1.1.csv");
 
         for (PropriedadeRustica propriedade : propriedades) {
             grafo.adicionarProprietario(propriedade.getOwner());
+            grafoAdj.adicionarPropriedade(propriedade);
         }
+
+        grafoAdj.construirAdjacencias();
 
         for (int i = 0; i < propriedades.size(); i++) {
             for (int j = i + 1; j < propriedades.size(); j++) {
