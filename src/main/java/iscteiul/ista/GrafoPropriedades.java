@@ -16,6 +16,11 @@ public class GrafoPropriedades {
     private STRtree index;
     private Map<PropriedadeRustica, Geometry> geometriaMap;
 
+    /**
+     * Construtor da classe {@code GrafoPropriedades}.
+     * Inicializa as estruturas necessárias para representar o grafo,
+     * incluindo o mapa de adjacências, o mapa de geometrias e o índice espacial.
+     */
     public GrafoPropriedades() {
         grafoPropriedades = new ConcurrentHashMap<>();
         geometriaMap = new ConcurrentHashMap<>();
@@ -43,7 +48,6 @@ public class GrafoPropriedades {
      * Constrói as listas de ajdacências de todas as propriedades definidas no ficheiro csv
      */
     public void construirAdjacencias() {
-        // Lista thread-safe para armazenar pares adjacentes
         List<Pair<PropriedadeRustica, PropriedadeRustica>> adjacencias = Collections.synchronizedList(new ArrayList<>());
 
         grafoPropriedades.keySet().parallelStream().forEach(propriedade -> {
@@ -57,7 +61,7 @@ public class GrafoPropriedades {
                     Geometry geomVizinho = geometriaMap.get(vizinho);
 
                     if (geom.touches(geomVizinho) || geom.intersects(geomVizinho)) {
-                        // Ordena o par para evitar duplicatas A-B e B-A
+                        // Ordena o par para evitar duplicados A-B e B-A
                         PropriedadeRustica menor = propriedade.getObjectId().compareTo(vizinho.getObjectId()) < 0 ? propriedade : vizinho;
                         PropriedadeRustica maior = menor == propriedade ? vizinho : propriedade;
                         adjacencias.add(new Pair<>(menor, maior));
@@ -76,11 +80,9 @@ public class GrafoPropriedades {
         }
     }
 
-
-
     /**
      *
-     *
+     * Se duas propriedades são adjacentes ou não
      * @param a uma propriedade
      * @param b uma propriedade
      * @return Se duas propriedades são adjacentes ou não
@@ -106,9 +108,17 @@ public class GrafoPropriedades {
             System.out.println(adjIds + "]");
         }
     }
-    
+
+    /**
+     * Devolve o grafo de adjacência das propriedades rústicas.
+     * Cada propriedade está associada a um conjunto de propriedades vizinhas.
+     *
+     * @return um mapa onde cada chave é uma propriedade rústica,
+     *         e o valor é o conjunto de propriedades adjacentes.
+     */
     public Map<PropriedadeRustica, Set<PropriedadeRustica>> getGrafo() {
         return grafoPropriedades;
     }
+
 
 }

@@ -80,7 +80,8 @@ public class GrafoPropietarios {
      * adicionando arestas entre proprietários de propriedades adjacentes.
      *
      * @param propriedades Lista de propriedades rústicas.
-     * @return Grafo de proprietários.
+     * @param grafoPropriedades Grafo das Propriedades
+     *
      */
     public void construirGrafoProprietarios(GrafoPropriedades grafoPropriedades, List<PropriedadeRustica> propriedades) {
 
