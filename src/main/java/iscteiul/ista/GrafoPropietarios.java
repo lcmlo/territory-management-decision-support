@@ -7,7 +7,7 @@ import java.util.*;
 
 public class GrafoPropietarios {
 
-    private Map<Integer, Set<Integer>> grafo; // 用于存储每个 Owner 与其他相邻的 Owners
+    private final Map<Integer, Set<Integer>> grafo;
 
     public GrafoPropietarios() {
         this.grafo = new HashMap<>();
@@ -18,7 +18,7 @@ public class GrafoPropietarios {
     }
 
     public void adicionarVizinhanca(int owner1, int owner2) {
-        if (owner1 != owner2) { // 避免自连接
+        if (owner1 != owner2) {
             grafo.get(owner1).add(owner2);
             grafo.get(owner2).add(owner1);
         }
@@ -41,12 +41,10 @@ public class GrafoPropietarios {
     public static GrafoPropietarios construirGrafoProprietarios(List<PropriedadeRustica> propriedades) {
         GrafoPropietarios grafoProprietarios = new GrafoPropietarios();
 
-        // 初始化所有业主
         for (PropriedadeRustica propriedade : propriedades) {
             grafoProprietarios.adicionarProprietario(propriedade.getOwner());
         }
 
-        // 对所有成对的地块进行比较
         for (int i = 0; i < propriedades.size(); i++) {
             PropriedadeRustica p1 = propriedades.get(i);
 
@@ -67,7 +65,6 @@ public class GrafoPropietarios {
         return grafoProprietarios;
     }
     private static boolean saoAdjacentes(PropriedadeRustica p1, PropriedadeRustica p2) {
-        // 检查是否在相同的 Freguesia 和 Municipio
         if (!(p1.getFreguesia().equals(p2.getFreguesia()) &&
                 p1.getMunicipio().equals(p2.getMunicipio()))) {
             return false;
@@ -78,7 +75,7 @@ public class GrafoPropietarios {
             Geometry geometry1 = reader.read(p1.getGeometry());
             Geometry geometry2 = reader.read(p2.getGeometry());
 
-            return geometry1.intersects(geometry2); // 使用 intersects 更强关系判断
+            return geometry1.intersects(geometry2);
         } catch (Exception e) {
             e.printStackTrace();
             return false;

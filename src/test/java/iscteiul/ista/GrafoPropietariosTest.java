@@ -17,15 +17,12 @@ public class GrafoPropietariosTest {
     public void setUp() {
         grafo = new GrafoPropietarios();
 
-        // 你在 Main 类中应该已经实现了 carregarPropriedadesCSV 方法
         propriedades = Main.carregarPropriedadesCSV("Madeira-Moodle-1.1.csv");
 
-        // 添加所有者节点
         for (PropriedadeRustica propriedade : propriedades) {
             grafo.adicionarProprietario(propriedade.getOwner());
         }
 
-        // 添加邻接关系
         for (int i = 0; i < propriedades.size(); i++) {
             for (int j = i + 1; j < propriedades.size(); j++) {
                 PropriedadeRustica p1 = propriedades.get(i);
