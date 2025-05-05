@@ -26,9 +26,9 @@ public class Main {
      * @param args Argumentos de linha de comando (não utilizados).
      */
     public static void main(String[] args) {
-        String fileName = "111.csv";
-        //TODO aviso este ficheiro a representacao do grafo e excessiva
-       // String fileName = "Madeira-Moodle-1.1.csv";
+       // String fileName = "111.csv";
+        //Aviso no "Madeira-Moodle-1.1.csv" a representacao do grafo e gigante
+       String fileName = "Madeira-Moodle-1.1.csv";
         List<PropriedadeRustica> propriedades = carregarPropriedadesCSV(fileName);
 
         GrafoPropriedades grafoVizinhanca = new GrafoPropriedades();
@@ -83,6 +83,9 @@ public class Main {
             }
         }
         VisualizadorGrafo.mostrarGrafo(grafoJGraphT, "Grafo de Proprietários Vizinhos");
+
+        CalculadoraArea.calcularAreaMediaPorZona(propriedades);
+
     }
 
     /**
