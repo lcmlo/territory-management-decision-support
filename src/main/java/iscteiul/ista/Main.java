@@ -85,6 +85,8 @@ public class Main {
         VisualizadorGrafo.mostrarGrafo(grafoJGraphT, "Grafo de Proprietários Vizinhos");
 
         CalculadoraArea.calcularAreaMediaPorZona(propriedades);
+        CalculadoraArea.calcularAreaMediaComFusao(propriedades, grafoVizinhanca);
+
 
     }
 
