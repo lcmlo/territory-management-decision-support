@@ -26,12 +26,13 @@ public class Main {
      * @param args Argumentos de linha de comando (não utilizados).
      */
     public static void main(String[] args) {
-       // String fileName = "111.csv";
+        String fileName = "111.csv";
         //Aviso no "Madeira-Moodle-1.1.csv" a representacao do grafo e gigante
-       String fileName = "Madeira-Moodle-1.1.csv";
+        //String fileName = "Madeira-Moodle-1.1.csv";
         List<PropriedadeRustica> propriedades = carregarPropriedadesCSV(fileName);
 
         GrafoPropriedades grafoVizinhanca = new GrafoPropriedades();
+
 
         // Adicionar as propriedades ao grafo
         for (PropriedadeRustica p : propriedades) {
@@ -85,7 +86,14 @@ public class Main {
         VisualizadorGrafo.mostrarGrafo(grafoJGraphT, "Grafo de Proprietários Vizinhos");
 
         CalculadoraArea.calcularAreaMediaPorZona(propriedades);
-        CalculadoraArea.calcularAreaMediaComFusao(propriedades, grafoVizinhanca);
+
+
+        //teste 6
+        List<Pair<PropriedadeRustica, PropriedadeRustica>> trocas =
+                SugestaoTrocas.sugerirTrocas(propriedades, grafoProprietarios, grafoVizinhanca);
+
+
+
 
 
     }
