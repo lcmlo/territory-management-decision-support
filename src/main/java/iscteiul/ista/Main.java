@@ -89,6 +89,7 @@ public class Main {
 
 
         //teste 6
+
         List<Pair<PropriedadeRustica, PropriedadeRustica>> trocas =
                 SugestaoTrocas.sugerirTrocas(propriedades, grafoProprietarios, grafoVizinhanca);
 

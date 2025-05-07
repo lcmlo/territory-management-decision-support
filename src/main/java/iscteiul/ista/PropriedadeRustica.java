@@ -19,6 +19,8 @@ public class PropriedadeRustica {
     private Geometry geometryObj;
 
 
+
+
     public Geometry getGeometryObj() {
         return geometryObj;
     }
