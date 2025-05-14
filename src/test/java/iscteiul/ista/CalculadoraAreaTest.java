@@ -25,7 +25,7 @@ class CalculadoraAreaTest {
         p1.setShapeArea(100);
         p1.setOwner(1);
         p1.setObjectId("1");
-        //p1.setGeometry("MULTIPOLYGON (((0 0, 0 1, 1 1, 1 0, 0 0)))");
+        p1.setGeometry("MULTIPOLYGON (((0 0, 0 1, 1 1, 1 0, 0 0)))");
 
         PropriedadeRustica p2 = new PropriedadeRustica();
         p2.setFreguesia("Freguesia A");
@@ -34,7 +34,7 @@ class CalculadoraAreaTest {
         p2.setShapeArea(200);
         p2.setOwner(1);
         p2.setObjectId("2");
-       // p2.setGeometry("MULTIPOLYGON (((1 0, 1 1, 2 1, 2 0, 1 0)))");
+        p2.setGeometry("MULTIPOLYGON (((1 0, 1 1, 2 1, 2 0, 1 0)))");
 
         PropriedadeRustica p3 = new PropriedadeRustica();
         p3.setFreguesia("Freguesia B");
@@ -43,7 +43,7 @@ class CalculadoraAreaTest {
         p3.setShapeArea(500);
         p3.setOwner(2);
         p3.setObjectId("3");
-        //p3.setGeometry("MULTIPOLYGON (((10 10, 10 11, 11 11, 11 10, 10 10)))");
+        p3.setGeometry("MULTIPOLYGON (((10 10, 10 11, 11 11, 11 10, 10 10)))");
 
         propriedades.add(p1);
         propriedades.add(p2);
