@@ -1,7 +1,12 @@
 package iscteiul.ista;
 
+import org.locationtech.jts.geom.Coordinate;
+
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,9 +16,9 @@ public class SugestaoTrocas {
     public static List<Pair<PropriedadeRustica, PropriedadeRustica>> sugerirTrocas(
             List<PropriedadeRustica> propriedades,
             GrafoPropietarios grafoProprietarios,
-            GrafoPropriedades grafoPropriedades
-    ) {
+            GrafoPropriedades grafoPropriedades) {
         List<Pair<PropriedadeRustica, PropriedadeRustica>> trocasSugeridas = new ArrayList<>();
+        Map<PropriedadeRustica,List<PropriedadeRustica>> proximidade= mapaPropriedadesProximas(propriedades);
         StringBuilder sb = new StringBuilder();
 
         Map<Integer, List<PropriedadeRustica>> mapaPorDono = propriedades.stream()
@@ -51,7 +56,7 @@ public class SugestaoTrocas {
                             double areaMedia = (a.getShapeArea() + b.getShapeArea()) / 2.0;
                             double percentualDiferenca = areaDiff / areaMedia;
 
-                            if (percentualDiferenca < 0.2) {
+                            if (percentualDiferenca < 0.2 && proximidade.get(a).contains(b)) {
                                 trocasSugeridas.add(new Pair<>(a, b));
 
                                 sb.append(String.format(
@@ -117,5 +122,113 @@ public class SugestaoTrocas {
         }
 
         return areasAgrupadas.stream().mapToDouble(Double::doubleValue).average().orElse(0);
+    }
+
+
+    /**
+     * Retorna um mapa onde cada propriedade está associada às propriedades de donos diferentes
+     * que estão a menos de 5 km de distância.
+     *
+     * @param propriedades Lista de propriedades
+     * @return Mapa com as propriedades e suas vizinhas próximas (< 5 km)
+     */
+    public static Map<PropriedadeRustica, List<PropriedadeRustica>> mapaPropriedadesProximas(List<PropriedadeRustica> propriedades) {
+        Map<PropriedadeRustica, List<PropriedadeRustica>> proximidades = new HashMap<>();
+
+        for (int i = 0; i < propriedades.size(); i++) {
+            PropriedadeRustica a = propriedades.get(i);
+
+            for (int j = i + 1; j < propriedades.size(); j++) {
+                PropriedadeRustica b = propriedades.get(j);
+
+                if (a.getOwner() != b.getOwner()) {
+                    double dist = a.getGeometryObj().distance(b.getGeometryObj());
+
+                    if (dist < 5000) { // 5 km
+                        proximidades.computeIfAbsent(a, k -> new ArrayList<>()).add(b);
+                        proximidades.computeIfAbsent(b, k -> new ArrayList<>()).add(a); // garantir simetria
+
+                        System.out.printf(" Distância: %.2f m entre %s e %s%n",
+                                dist, a.getObjectId(), b.getObjectId());
+                    }
+                }
+            }
+        }
+
+        return proximidades;
+    }
+
+    public List<Municipio> tresMaioresMunicipios(String fileName) {
+        // String caminhoCsv = "C:\\Users\\Utilizador\\IdeaProjects\\ES-2024-25-2Sem-GrupoK\\src\\main\\resources\\InfoMadeira.csv"; // Caminho para o ficheiro CSV
+
+        List<Municipio> municipios = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String linha = br.readLine(); // Ler cabeçalho
+            while ((linha = br.readLine()) != null) {
+                String[] partes = linha.split(";");
+                String nome = partes[0].trim();
+                int populacao = Integer.parseInt(partes[1].trim());
+                Coordinate coord = new Coordinate(Double.parseDouble(partes[2].trim()), Double.parseDouble(partes[3].trim()));
+                municipios.add(new Municipio(nome, populacao,coord));
+            }
+        } catch (IOException e) {
+            System.err.println("Erro a ler o ficheiro: " + e.getMessage());
+        }
+
+        // Ordenar por população decrescente e obter os 3 primeiros
+        List<Municipio> top3 = municipios.stream()
+                .sorted(Comparator.comparingInt(Municipio::getPopulacao).reversed())
+                .limit(3)
+                .collect(Collectors.toList());
+
+        System.out.println("Top 3 municípios com maior população:");
+        for (Municipio m : top3) {
+            System.out.printf("- %s (%d habitantes)%n", m.getNome(), m.getPopulacao());
+        }
+        return municipios;
+    }
+
+    public ResultadoMunicipioDistancia principalMunicipioMaisPerto(List<Municipio> municipios, PropriedadeRustica propriedade) {
+        double menorDistancia = Double.MAX_VALUE;
+        Municipio municipioMaisPerto = null;
+
+        for (Municipio m : municipios) {
+            double distancia = calcularDistancia(propriedade, m);
+            if (distancia < menorDistancia) {
+                menorDistancia = distancia;
+                municipioMaisPerto = m;
+            }
+        }
+
+        return new ResultadoMunicipioDistancia(municipioMaisPerto, menorDistancia);
+    }
+
+    public static double calcularDistancia(PropriedadeRustica propriedade, Municipio municipio) {
+        if (propriedade.getGeometryObj() == null) {
+            System.err.println("Geometria da propriedade não está definida.");
+            return -1;
+        }
+
+        Coordinate centroide = propriedade.getGeometryObj().getCentroid().getCoordinate();
+        Coordinate cidade = municipio.getCoordenadas();
+        return distancia(centroide, cidade);
+    }
+
+    public static double distancia(Coordinate c1, Coordinate c2) {
+        double R = 6371000; // raio da Terra em metros
+        double lat1 = Math.toRadians(c1.y);
+        double lon1 = Math.toRadians(c1.x);
+        double lat2 = Math.toRadians(c2.y);
+        double lon2 = Math.toRadians(c2.x);
+
+        double dlat = lat2 - lat1;
+        double dlon = lon2 - lon1;
+
+        double a = Math.sin(dlat / 2) * Math.sin(dlat / 2)
+                + Math.cos(lat1) * Math.cos(lat2)
+                + Math.sin(dlon / 2) * Math.sin(dlon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
     }
 }

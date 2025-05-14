@@ -1,5 +1,7 @@
 package iscteiul.ista;
 
+import java.util.Objects;
+
 /**
  * Classe genérica que representa um par de dois elementos.
  *
@@ -23,5 +25,20 @@ public class Pair<F, S> {
     public Pair(F first, S second) {
         this.first = first;
         this.second = second;
+    }
+
+    public F getFirst() {
+        return first;
+    }
+    public S getSecond() {
+        return second;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Pair)) return false;
+        Pair<?, ?> other = (Pair<?, ?>) o;
+        return Objects.equals(first, other.first) && Objects.equals(second, other.second);
     }
 }
