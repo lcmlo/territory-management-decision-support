@@ -1,12 +1,9 @@
 package iscteiul.ista;
 
-import org.locationtech.jts.geom.Coordinate;
+
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,11 +49,17 @@ public class SugestaoTrocas {
                         b.setOwner(vizinho);
 
                         if (mediaDepoisA > mediaAntesA && mediaDepoisB > mediaAntesB) {
+                            boolean formaAceitavel = a.getIndiceCompacidade() > 0.6 && b.getIndiceCompacidade() > 0.6;
+
+                            boolean conectaA = conectaGrupoVizinho(b, terrasA, grafoPropriedades);
+                            boolean conectaB = conectaGrupoVizinho(a, terrasB, grafoPropriedades);
+                            boolean melhoraContinuidade = conectaA || conectaB;
+
                             double areaDiff = Math.abs(a.getShapeArea() - b.getShapeArea());
                             double areaMedia = (a.getShapeArea() + b.getShapeArea()) / 2.0;
                             double percentualDiferenca = areaDiff / areaMedia;
 
-                            if (percentualDiferenca < 0.2 && proximidade.get(a).contains(b)) {
+                            if ((percentualDiferenca < 0.2 && melhoraContinuidade) || (percentualDiferenca<0.2 && proximidade.get(a).contains(b) && formaAceitavel)) {
                                 trocasSugeridas.add(new Pair<>(a, b));
 
                                 sb.append(String.format(
@@ -158,77 +161,14 @@ public class SugestaoTrocas {
         return proximidades;
     }
 
-    public List<Municipio> tresMaioresMunicipios(String fileName) {
-        // String caminhoCsv = "C:\\Users\\Utilizador\\IdeaProjects\\ES-2024-25-2Sem-GrupoK\\src\\main\\resources\\InfoMadeira.csv"; // Caminho para o ficheiro CSV
-
-        List<Municipio> municipios = new ArrayList<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-            String linha = br.readLine(); // Ler cabeçalho
-            while ((linha = br.readLine()) != null) {
-                String[] partes = linha.split(";");
-                String nome = partes[0].trim();
-                int populacao = Integer.parseInt(partes[1].trim());
-                Coordinate coord = new Coordinate(Double.parseDouble(partes[2].trim()), Double.parseDouble(partes[3].trim()));
-                municipios.add(new Municipio(nome, populacao,coord));
-            }
-        } catch (IOException e) {
-            System.err.println("Erro a ler o ficheiro: " + e.getMessage());
-        }
-
-        // Ordenar por população decrescente e obter os 3 primeiros
-        List<Municipio> top3 = municipios.stream()
-                .sorted(Comparator.comparingInt(Municipio::getPopulacao).reversed())
-                .limit(3)
-                .collect(Collectors.toList());
-
-        System.out.println("Top 3 municípios com maior população:");
-        for (Municipio m : top3) {
-            System.out.printf("- %s (%d habitantes)%n", m.getNome(), m.getPopulacao());
-        }
-        return municipios;
-    }
-
-    public ResultadoMunicipioDistancia principalMunicipioMaisPerto(List<Municipio> municipios, PropriedadeRustica propriedade) {
-        double menorDistancia = Double.MAX_VALUE;
-        Municipio municipioMaisPerto = null;
-
-        for (Municipio m : municipios) {
-            double distancia = calcularDistancia(propriedade, m);
-            if (distancia < menorDistancia) {
-                menorDistancia = distancia;
-                municipioMaisPerto = m;
+    public static boolean conectaGrupoVizinho(PropriedadeRustica novaProp,
+                                              List<PropriedadeRustica> outrasDoMesmoDono,
+                                              GrafoPropriedades grafo) {
+        for (PropriedadeRustica outra : outrasDoMesmoDono) {
+            if (grafo.getGrafo().getOrDefault(novaProp, Set.of()).contains(outra)) {
+                return true; // conecta-se a alguma já existente
             }
         }
-
-        return new ResultadoMunicipioDistancia(municipioMaisPerto, menorDistancia);
-    }
-
-    public static double calcularDistancia(PropriedadeRustica propriedade, Municipio municipio) {
-        if (propriedade.getGeometryObj() == null) {
-            System.err.println("Geometria da propriedade não está definida.");
-            return -1;
-        }
-
-        Coordinate centroide = propriedade.getGeometryObj().getCentroid().getCoordinate();
-        Coordinate cidade = municipio.getCoordenadas();
-        return distancia(centroide, cidade);
-    }
-
-    public static double distancia(Coordinate c1, Coordinate c2) {
-        double R = 6371000; // raio da Terra em metros
-        double lat1 = Math.toRadians(c1.y);
-        double lon1 = Math.toRadians(c1.x);
-        double lat2 = Math.toRadians(c2.y);
-        double lon2 = Math.toRadians(c2.x);
-
-        double dlat = lat2 - lat1;
-        double dlon = lon2 - lon1;
-
-        double a = Math.sin(dlat / 2) * Math.sin(dlat / 2)
-                + Math.cos(lat1) * Math.cos(lat2)
-                + Math.sin(dlon / 2) * Math.sin(dlon / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
+        return false;
     }
 }

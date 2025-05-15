@@ -230,4 +230,12 @@ public class PropriedadeRustica {
                 ", ilha='" + ilha + '\'' +
                 '}';
     }
+
+    public double getIndiceCompacidade() {
+        if (this.getGeometryObj() == null) return 0;
+        double area = this.getGeometryObj().getArea();
+        double perimetro = this.getGeometryObj().getLength();
+        if (area == 0) return 0;
+        return (4 * Math.PI * area) / (perimetro * perimetro);  // valor ≈ 1 se for um círculo
+    }
 }
