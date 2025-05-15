@@ -5,6 +5,8 @@ import com.opencsv.exceptions.CsvValidationException;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.WKTReader;
 
 import java.io.InputStreamReader;
 import java.io.InputStream;
@@ -26,12 +28,13 @@ public class Main {
      * @param args Argumentos de linha de comando (não utilizados).
      */
     public static void main(String[] args) {
-       // String fileName = "111.csv";
+        String fileName = "111_v2.csv";
         //Aviso no "Madeira-Moodle-1.1.csv" a representacao do grafo e gigante
-       String fileName = "Madeira-Moodle-1.1.csv";
+        //String fileName = "Madeira-Moodle-1.1.csv";
         List<PropriedadeRustica> propriedades = carregarPropriedadesCSV(fileName);
 
         GrafoPropriedades grafoVizinhanca = new GrafoPropriedades();
+
 
         // Adicionar as propriedades ao grafo
         for (PropriedadeRustica p : propriedades) {
@@ -85,9 +88,11 @@ public class Main {
         VisualizadorGrafo.mostrarGrafo(grafoJGraphT, "Grafo de Proprietários Vizinhos");
 
         CalculadoraArea.calcularAreaMediaPorZona(propriedades);
-        CalculadoraArea.calcularAreaMediaComFusao(propriedades, grafoVizinhanca);
 
 
+        //teste 6
+
+        List<Pair<PropriedadeRustica, PropriedadeRustica>> trocas = SugestaoTrocas.sugerirTrocas(propriedades, grafoProprietarios, grafoVizinhanca);
     }
 
     /**
@@ -131,9 +136,18 @@ public class Main {
                     continue; // Continua com a próxima linha em vez de retornar
                 }
 
-                String geometry = linha[5];
 
+                String geometry = linha[5];
                 propriedade.setGeometry(geometry);
+                try {
+                    WKTReader wktReader = new WKTReader();
+                    Geometry geometryWKT = wktReader.read(geometry);
+                    propriedade.setGeometryObj(geometryWKT); // este método precisa de existir na tua classe
+                } catch (Exception e) {
+                    System.out.println("Erro ao ler geometria WKT: " + geometry);
+                    continue; // ignora esta linha
+                }
+
                 propriedade.setOwner(Integer.parseInt(linha[6]));
                 propriedade.setFreguesia(linha[7]);
                 propriedade.setMunicipio(linha[8]);
@@ -147,4 +161,5 @@ public class Main {
 
         return propriedades;
     }
+
 }

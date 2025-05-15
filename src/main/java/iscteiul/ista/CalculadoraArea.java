@@ -146,5 +146,4 @@ public class CalculadoraArea {
         return areasAgrupadas.stream().mapToDouble(Double::doubleValue).average().orElse(0);
     }
 
-
 }
