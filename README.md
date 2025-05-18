@@ -5,4 +5,4 @@ LEI GRUPO K
 
 Problemas no método sugerirTrocas() para ficheiros grandes
 
-Complexidade ciclomatica esta dentro da foler com o mesmo nome
+Complexidade ciclomatica, Javadoc e Coverage report estao dentro das folders com o mesmo nome
