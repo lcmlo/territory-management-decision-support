@@ -1,13 +1,12 @@
 package iscteiul.ista;
 
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvValidationException;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.WKTReader;
 
+import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.InputStream;
 import java.io.IOException;
@@ -28,7 +27,7 @@ public class Main {
      * @param args Argumentos de linha de comando (não utilizados).
      */
     public static void main(String[] args) {
-        String fileName = "111_v2.csv";
+        String fileName = "111.csv";
         //Aviso no "Madeira-Moodle-1.1.csv" a representacao do grafo e gigante
         //String fileName = "Madeira-Moodle-1.1.csv";
         List<PropriedadeRustica> propriedades = carregarPropriedadesCSV(fileName);
@@ -105,38 +104,38 @@ public class Main {
 
         // Usando ClassLoader para aceder ao arquivo na pasta resources
         try (InputStream inputStream = Main.class.getClassLoader().getResourceAsStream(fileName);
-             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-             CSVReader reader = new CSVReader(inputStreamReader)) {
+             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream)))
+              {
 
             if (inputStream == null) {
                 System.out.println("Arquivo não encontrado: " + fileName);
                 return propriedades; // Retorna lista vazia se o arquivo não for encontrado
             }
 
-            String[] linha;
-            reader.skip(1); // Pula o cabeçalho
-            while ((linha = reader.readNext()) != null) { // Lê todas as linhas
+            String linha=br.readLine(); // Pula o cabeçalho
+            while ((linha = br.readLine()) != null) { // Lê todas as linhas
+                String[] partes = linha.split(";");
                 PropriedadeRustica propriedade = new PropriedadeRustica();
-                propriedade.setObjectId(linha[0]);
-                propriedade.setParId(linha[1]);
+                propriedade.setObjectId(partes[0]);
+                propriedade.setParId(partes[1]);
 
                 try {
-                    propriedade.setParNum(Double.parseDouble(linha[2].replace(',', '.')));
+                    propriedade.setParNum(Double.parseDouble(partes[2].replace(',', '.')));
                 } catch (NumberFormatException e) {
-                    System.out.println("Erro de formatação em PAR_NUM: " + linha[2]);
+                    System.out.println("Erro de formatação em PAR_NUM: " + partes[2]);
                     continue; // Continua com a próxima linha em vez de retornar
                 }
 
                 try {
-                    propriedade.setShapeLength(Double.parseDouble(linha[3].replace(',', '.')));
-                    propriedade.setShapeArea(Double.parseDouble(linha[4].replace(',', '.')));
+                    propriedade.setShapeLength(Double.parseDouble(partes[3].replace(',', '.')));
+                    propriedade.setShapeArea(Double.parseDouble(partes[4].replace(',', '.')));
                 } catch (NumberFormatException e) {
-                    System.out.println("Erro de formatação nos valores de Shape: " + linha[3] + ", " + linha[4]);
+                    System.out.println("Erro de formatação nos valores de Shape: " + partes[3] + ", " + partes[4]);
                     continue; // Continua com a próxima linha em vez de retornar
                 }
 
 
-                String geometry = linha[5];
+                String geometry = partes[5];
                 propriedade.setGeometry(geometry);
                 try {
                     WKTReader wktReader = new WKTReader();
@@ -147,14 +146,14 @@ public class Main {
                     continue; // ignora esta linha
                 }
 
-                propriedade.setOwner(Integer.parseInt(linha[6]));
-                propriedade.setFreguesia(linha[7]);
-                propriedade.setMunicipio(linha[8]);
-                propriedade.setIlha(linha[9]);
+                propriedade.setOwner(Integer.parseInt(partes[6]));
+                propriedade.setFreguesia(partes[7]);
+                propriedade.setMunicipio(partes[8]);
+                propriedade.setIlha(partes[9]);
 
                 propriedades.add(propriedade); // Adiciona a propriedade à lista
             }
-        } catch (IOException | CsvValidationException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 

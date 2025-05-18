@@ -9,6 +9,9 @@ import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 
@@ -30,13 +33,16 @@ public class SugestaoTrocas {
     public static List<Pair<PropriedadeRustica, PropriedadeRustica>> sugerirTrocas(
             List<PropriedadeRustica> propriedades,
             GrafoPropietarios grafoProprietarios,
-            GrafoPropriedades grafoPropriedades,List<Municipio> tresMunicipios) {
-        List<Pair<PropriedadeRustica, PropriedadeRustica>> trocasSugeridas = new ArrayList<>();
-
+            GrafoPropriedades grafoPropriedades,
+            List<Municipio> tresMunicipios
+    ) {
+        List<Pair<PropriedadeRustica, PropriedadeRustica>> trocasSugeridas = Collections.synchronizedList(new ArrayList<>());
         StringBuilder sb = new StringBuilder();
-
         Map<Integer, List<PropriedadeRustica>> mapaPorDono = propriedades.stream()
                 .collect(Collectors.groupingBy(PropriedadeRustica::getOwner));
+
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        List<Callable<Void>> tarefas = new ArrayList<>();
 
         for (Integer donoA : mapaPorDono.keySet()) {
             for (Integer vizinho : grafoProprietarios.getVizinhos(donoA)) {
@@ -45,15 +51,15 @@ public class SugestaoTrocas {
                 List<PropriedadeRustica> terrasA = mapaPorDono.get(donoA);
                 List<PropriedadeRustica> terrasB = mapaPorDono.get(vizinho);
 
-                for (PropriedadeRustica a : terrasA) {
-                    for (PropriedadeRustica b : terrasB) {
-                        double valorA = PropriedadeRustica.avaliarPropriedade(a, tresMunicipios);
-                        double valorB = PropriedadeRustica.avaliarPropriedade(b, tresMunicipios);
-                        System.out.println(valorA + "," + valorB);
-                        double diffRelativa = Math.abs(valorA - valorB) / ((valorA + valorB) / 2.0);
-                        boolean valoresSemelhantes = diffRelativa <= 0.05;
+                tarefas.add(() -> {
+                    for (PropriedadeRustica a : terrasA) {
+                        for (PropriedadeRustica b : terrasB) {
 
-                        if (valoresSemelhantes) {
+                            double valorA = PropriedadeRustica.avaliarPropriedade(a, tresMunicipios);
+                            double valorB = PropriedadeRustica.avaliarPropriedade(b, tresMunicipios);
+                            double diffRelativa = Math.abs(valorA - valorB) / ((valorA + valorB) / 2.0);
+                            boolean valoresSemelhantes = diffRelativa <= 0.05;
+
                             List<PropriedadeRustica> novasTerrasA = new ArrayList<>(terrasA);
                             List<PropriedadeRustica> novasTerrasB = new ArrayList<>(terrasB);
                             novasTerrasA.remove(a);
@@ -72,37 +78,66 @@ public class SugestaoTrocas {
                             a.setOwner(donoA);
                             b.setOwner(vizinho);
 
-                            if (mediaDepoisA > mediaAntesA && mediaDepoisB > mediaAntesB) {
-                                boolean conectaA = conectaGrupoVizinho(b, terrasA, grafoPropriedades);
-                                boolean conectaB = conectaGrupoVizinho(a, terrasB, grafoPropriedades);
-                                boolean melhoraContinuidade = conectaA || conectaB;
+                            boolean conectaA = conectaGrupoVizinho(b, terrasA, grafoPropriedades);
+                            boolean conectaB = conectaGrupoVizinho(a, terrasB, grafoPropriedades);
+                            boolean melhoraContinuidade = conectaA || conectaB;
 
+                            if (mediaDepoisA > mediaAntesA && mediaDepoisB > mediaAntesB) {
                                 double areaDiff = Math.abs(a.getShapeArea() - b.getShapeArea());
                                 double areaMedia = (a.getShapeArea() + b.getShapeArea()) / 2.0;
                                 double percentualDiferenca = areaDiff / areaMedia;
 
                                 if (percentualDiferenca < 0.2 && melhoraContinuidade) {
+                                    synchronized (trocasSugeridas) {
+                                        trocasSugeridas.add(new Pair<>(a, b));
+                                    }
+                                    synchronized (sb) {
+                                        sb.append(String.format(
+                                                "\n🔁 Trocar propriedade %s (dono %d, área %.2f m²) ↔ propriedade %s (dono %d, área %.2f m²)\n",
+                                                a.getObjectId(), donoA, a.getShapeArea(),
+                                                b.getObjectId(), vizinho, b.getShapeArea()
+                                        ));
+                                        sb.append(String.format("   📈 Média dono %d: antes = %.2f m², depois = %.2f m²\n", donoA, mediaAntesA, mediaDepoisA));
+                                        sb.append(String.format("   📈 Média dono %d: antes = %.2f m², depois = %.2f m²\n", vizinho, mediaAntesB, mediaDepoisB));
+                                    }
+                                }
+                            } else if (melhoraContinuidade && valoresSemelhantes) {
+                                synchronized (trocasSugeridas) {
                                     trocasSugeridas.add(new Pair<>(a, b));
+                                }
 
+                                double ganhoValorA = ((valorB - valorA) / valorA) * 100;
+                                double ganhoValorB = ((valorA - valorB) / valorB) * 100;
+
+                                synchronized (sb) {
                                     sb.append(String.format(
-                                            "\n🔁 Trocar propriedade %s (dono %d, área %.2f m²) ↔ propriedade %s (dono %d, área %.2f m²)\n",
-                                            a.getObjectId(), donoA, a.getShapeArea(),
-                                            b.getObjectId(), vizinho, b.getShapeArea()
+                                            "\n🔁 Trocar propriedade %s (dono %d, avaliação %.2f) ↔ propriedade %s (dono %d, avaliação %.2f)\n",
+                                            a.getObjectId(), donoA, valorA,
+                                            b.getObjectId(), vizinho, valorB
                                     ));
-                                    sb.append(String.format("   📈 Média dono %d: antes = %.2f m², depois = %.2f m²\n", donoA, mediaAntesA, mediaDepoisA));
-                                    sb.append(String.format("   📈 Média dono %d: antes = %.2f m², depois = %.2f m²\n", vizinho, mediaAntesB, mediaDepoisB));
+                                    sb.append(String.format("   💰 Valor dono %d: %.2f ↔ %.2f (diferença = %.2f%%)\n", donoA, valorA, valorB, ganhoValorA));
+                                    sb.append(String.format("   💰 Valor dono %d: %.2f ↔ %.2f (diferença = %.2f%%)\n", vizinho, valorB, valorA, ganhoValorB));
                                 }
                             }
                         }
                     }
-                }
+                    return null;
+                });
             }
         }
+
+        try {
+            executor.invokeAll(tarefas);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        executor.shutdown();
 
         if (sb.isEmpty()) {
             sb.append("⚠️ Nenhuma troca sugerida.");
         }
 
+        // Mostrar janela Swing
         JTextArea textArea = new JTextArea(sb.toString());
         textArea.setEditable(false);
         textArea.setCaretPosition(0);
@@ -118,6 +153,7 @@ public class SugestaoTrocas {
 
         return trocasSugeridas;
     }
+
 
     /**
      * Calcula a média das áreas agrupadas das propriedades de um proprietário,
