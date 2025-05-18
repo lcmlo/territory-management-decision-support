@@ -4,3 +4,5 @@ LEI GRUPO K
 110721 Pedro Li (Pclin0620)
 
 Problemas no método sugerirTrocas() para ficheiros grandes
+
+Complexidade ciclomatica esta dentro da foler com o mesmo nome
