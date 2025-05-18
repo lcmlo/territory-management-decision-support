@@ -25,10 +25,20 @@ public class PropriedadeRustica {
 
 
 
+    /**
+     * Devolve a geometria em WKT.
+     *
+     * @return string WKT da geometria da parcela
+     */
     public Geometry getGeometryObj() {
         return geometryObj;
     }
 
+    /**
+     * Define a geometria da parcela.
+     *
+     * @param geometryObj string WKT a associar
+     */
     public void setGeometryObj(Geometry geometryObj) {
         this.geometryObj = geometryObj;
     }
@@ -235,6 +245,11 @@ public class PropriedadeRustica {
                 '}';
     }
 
+    /**
+     * Devolve o índice de compacidade calculado.
+     *
+     * @return valor do índice de compacidade
+     */
     public double getIndiceCompacidade() {
         if (this.getGeometryObj() == null) return 0;
         double area = this.getGeometryObj().getArea();

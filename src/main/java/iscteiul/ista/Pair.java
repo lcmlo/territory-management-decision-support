@@ -27,9 +27,19 @@ public class Pair<F, S> {
         this.second = second;
     }
 
+    /**
+     * Devolve o primeiro valor do par.
+     *
+     * @return o valor {@code F} armazenado em first
+     */
     public F getFirst() {
         return first;
     }
+    /**
+     * Devolve o segundo valor do par.
+     *
+     * @return o valor {@code S} armazenado em second
+     */
     public S getSecond() {
         return second;
     }

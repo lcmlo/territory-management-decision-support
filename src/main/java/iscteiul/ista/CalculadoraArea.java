@@ -5,7 +5,18 @@ import iscteiul.ista.PropriedadeRustica;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Fornece métodos para cálculo de área média de propriedades,
+ * quer de forma simples, quer agrupando adjacentes do mesmo proprietário.
+ */
 public class CalculadoraArea {
+
+    /**
+     * Construtor padrão.
+     */
+    public CalculadoraArea() {
+        // apenas para satisfazer Javadoc
+    }
 
     /**
      * Calcula a área média das propriedades com base numa área geográfica fornecida.

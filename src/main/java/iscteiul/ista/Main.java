@@ -22,6 +22,13 @@ import java.util.Set;
 public class Main {
 
     /**
+     * Construtor padrão (sem argumentos).
+     */
+    public Main() {
+        // não instanciado
+    }
+
+    /**
      * Método principal que carrega e exibe as propriedades rústicas de um arquivo CSV.
      *
      * @param args Argumentos de linha de comando (não utilizados).
