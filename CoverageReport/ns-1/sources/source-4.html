@@ -1,0 +1,286 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Main</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">iscteiul.ista</a>
+</div>
+
+<h1>Coverage Summary for Class: Main (iscteiul.ista)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Main</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.5%
+  </span>
+  <span class="absValue">
+    (3/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    38.1%
+  </span>
+  <span class="absValue">
+    (24/63)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package iscteiul.ista;
+&nbsp;
+&nbsp;import org.jgrapht.Graph;
+&nbsp;import org.jgrapht.graph.DefaultEdge;
+&nbsp;import org.jgrapht.graph.SimpleGraph;
+&nbsp;import org.locationtech.jts.geom.Geometry;
+&nbsp;import org.locationtech.jts.io.WKTReader;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;/**
+&nbsp; * Classe principal para carregar propriedades rústicas de um arquivo CSV e exibi-las.
+&nbsp; * Utiliza a biblioteca OpenCSV para ler o arquivo CSV e extrair os dados.
+&nbsp; */
+&nbsp;public class Main {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Construtor padrão (sem argumentos).
+&nbsp;     */
+<b class="nc">&nbsp;    public Main() {</b>
+&nbsp;        // não instanciado
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Método principal que carrega e exibe as propriedades rústicas de um arquivo CSV.
+&nbsp;     *
+&nbsp;     * @param args Argumentos de linha de comando (não utilizados).
+&nbsp;     */
+&nbsp;    public static void main(String[] args) {
+<b class="nc">&nbsp;        String fileName = &quot;111.csv&quot;;</b>
+&nbsp;        //Aviso no &quot;Madeira-Moodle-1.1.csv&quot; a representacao do grafo e gigante
+&nbsp;        //String fileName = &quot;Madeira-Moodle-1.1.csv&quot;;
+<b class="nc">&nbsp;        List&lt;PropriedadeRustica&gt; propriedades = carregarPropriedadesCSV(fileName);</b>
+&nbsp;
+<b class="nc">&nbsp;        GrafoPropriedades grafoVizinhanca = new GrafoPropriedades();</b>
+&nbsp;
+&nbsp;
+&nbsp;        // Adicionar as propriedades ao grafo
+<b class="nc">&nbsp;        for (PropriedadeRustica p : propriedades) {</b>
+<b class="nc">&nbsp;            grafoVizinhanca.adicionarPropriedade(p);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Adicionar adjacências entre as propriedades
+<b class="nc">&nbsp;        grafoVizinhanca.construirAdjacencias();</b>
+<b class="nc">&nbsp;        grafoVizinhanca.mostrarGrafo();</b>
+&nbsp;        // Converte o grafo de propriedades para um grafo de IDs (usando getObjectId())
+<b class="nc">&nbsp;        Graph&lt;Integer, DefaultEdge&gt; grafoIdsPropriedades = new SimpleGraph&lt;&gt;(DefaultEdge.class);</b>
+<b class="nc">&nbsp;        Map&lt;PropriedadeRustica, Set&lt;PropriedadeRustica&gt;&gt; mapaPropriedades = grafoVizinhanca.getGrafo();</b>
+&nbsp;
+&nbsp;        // Adiciona os nós (IDs das propriedades)
+<b class="nc">&nbsp;        for (PropriedadeRustica p : mapaPropriedades.keySet()) {</b>
+<b class="nc">&nbsp;            grafoIdsPropriedades.addVertex(Integer.parseInt(p.getObjectId()));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Adiciona as arestas (ligações entre IDs)
+<b class="nc">&nbsp;        for (PropriedadeRustica origem : mapaPropriedades.keySet()) {</b>
+<b class="nc">&nbsp;            int idOrigem = Integer.parseInt(origem.getObjectId());</b>
+<b class="nc">&nbsp;            for (PropriedadeRustica destino : mapaPropriedades.get(origem)) {</b>
+<b class="nc">&nbsp;                int idDestino = Integer.parseInt(destino.getObjectId());</b>
+<b class="nc">&nbsp;                if (!grafoIdsPropriedades.containsEdge(idOrigem, idDestino) &amp;&amp; idOrigem != idDestino) {</b>
+<b class="nc">&nbsp;                    grafoIdsPropriedades.addEdge(idOrigem, idDestino);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Chamada ao visualizador
+<b class="nc">&nbsp;        VisualizadorGrafo.mostrarGrafo(grafoIdsPropriedades, &quot;Grafo de Propriedades Vizinhas&quot;);</b>
+&nbsp;
+&nbsp;
+&nbsp;        // Construir grafo de proprietários
+<b class="nc">&nbsp;        GrafoPropietarios grafoProprietarios = new GrafoPropietarios();</b>
+<b class="nc">&nbsp;        grafoProprietarios.construirGrafoProprietarios(grafoVizinhanca, propriedades);</b>
+<b class="nc">&nbsp;        grafoProprietarios.exibirGrafo();</b>
+&nbsp;
+&nbsp;        // Visualizar graficamente o grafo de proprietários com JGraphX
+<b class="nc">&nbsp;        Graph&lt;Integer, DefaultEdge&gt; grafoJGraphT = new SimpleGraph&lt;&gt;(DefaultEdge.class);</b>
+<b class="nc">&nbsp;        for (Integer owner : grafoProprietarios.getGrafo().keySet()) {</b>
+<b class="nc">&nbsp;            grafoJGraphT.addVertex(owner);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        for (Integer owner : grafoProprietarios.getGrafo().keySet()) {</b>
+<b class="nc">&nbsp;            for (Integer vizinho : grafoProprietarios.getGrafo().get(owner)) {</b>
+<b class="nc">&nbsp;                if (!grafoJGraphT.containsEdge(owner, vizinho) &amp;&amp; owner != vizinho) {</b>
+<b class="nc">&nbsp;                    grafoJGraphT.addEdge(owner, vizinho);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        VisualizadorGrafo.mostrarGrafo(grafoJGraphT, &quot;Grafo de Proprietários Vizinhos&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        CalculadoraArea.calcularAreaMediaPorZona(propriedades);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Municipio&gt; tresMunicipios = SugestaoTrocas.tresMaioresMunicipios(&quot;InfoMadeira.csv&quot;);</b>
+<b class="nc">&nbsp;        List&lt;Pair&lt;PropriedadeRustica, PropriedadeRustica&gt;&gt; trocas = SugestaoTrocas.sugerirTrocas(propriedades, grafoProprietarios, grafoVizinhanca,tresMunicipios);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Carrega as propriedades rústicas a partir de um arquivo CSV.
+&nbsp;     *
+&nbsp;     * @param fileName Nome do arquivo CSV.
+&nbsp;     * @return Lista de propriedades rústicas carregadas a partir do arquivo CSV.
+&nbsp;     */
+&nbsp;    public static List&lt;PropriedadeRustica&gt; carregarPropriedadesCSV(String fileName) {
+<b class="fc">&nbsp;        List&lt;PropriedadeRustica&gt; propriedades = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // Usando ClassLoader para aceder ao arquivo na pasta resources
+<b class="fc">&nbsp;        try (InputStream inputStream = Main.class.getClassLoader().getResourceAsStream(fileName);</b>
+<b class="fc">&nbsp;             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream)))</b>
+&nbsp;              {
+&nbsp;
+<b class="pc">&nbsp;            if (inputStream == null) {</b>
+<b class="nc">&nbsp;                System.out.println(&quot;Arquivo não encontrado: &quot; + fileName);</b>
+<b class="nc">&nbsp;                return propriedades; // Retorna lista vazia se o arquivo não for encontrado</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            String linha=br.readLine(); // Pula o cabeçalho</b>
+<b class="fc">&nbsp;            while ((linha = br.readLine()) != null) { // Lê todas as linhas</b>
+<b class="fc">&nbsp;                String[] partes = linha.split(&quot;;&quot;);</b>
+<b class="fc">&nbsp;                PropriedadeRustica propriedade = new PropriedadeRustica();</b>
+<b class="fc">&nbsp;                propriedade.setObjectId(partes[0]);</b>
+<b class="fc">&nbsp;                propriedade.setParId(partes[1]);</b>
+&nbsp;
+&nbsp;                try {
+<b class="fc">&nbsp;                    propriedade.setParNum(Double.parseDouble(partes[2].replace(&#39;,&#39;, &#39;.&#39;)));</b>
+&nbsp;                } catch (NumberFormatException e) {
+<b class="nc">&nbsp;                    System.out.println(&quot;Erro de formatação em PAR_NUM: &quot; + partes[2]);</b>
+&nbsp;                    continue; // Continua com a próxima linha em vez de retornar
+&nbsp;                }
+&nbsp;
+&nbsp;                try {
+<b class="fc">&nbsp;                    propriedade.setShapeLength(Double.parseDouble(partes[3].replace(&#39;,&#39;, &#39;.&#39;)));</b>
+<b class="fc">&nbsp;                    propriedade.setShapeArea(Double.parseDouble(partes[4].replace(&#39;,&#39;, &#39;.&#39;)));</b>
+&nbsp;                } catch (NumberFormatException e) {
+<b class="nc">&nbsp;                    System.out.println(&quot;Erro de formatação nos valores de Shape: &quot; + partes[3] + &quot;, &quot; + partes[4]);</b>
+&nbsp;                    continue; // Continua com a próxima linha em vez de retornar
+&nbsp;                }
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;                String geometry = partes[5];</b>
+<b class="fc">&nbsp;                propriedade.setGeometry(geometry);</b>
+&nbsp;                try {
+<b class="fc">&nbsp;                    WKTReader wktReader = new WKTReader();</b>
+<b class="fc">&nbsp;                    Geometry geometryWKT = wktReader.read(geometry);</b>
+<b class="fc">&nbsp;                    propriedade.setGeometryObj(geometryWKT); // este método precisa de existir na tua classe</b>
+&nbsp;                } catch (Exception e) {
+<b class="nc">&nbsp;                    System.out.println(&quot;Erro ao ler geometria WKT: &quot; + geometry);</b>
+&nbsp;                    continue; // ignora esta linha
+&nbsp;                }
+&nbsp;
+<b class="fc">&nbsp;                propriedade.setOwner(Integer.parseInt(partes[6]));</b>
+<b class="fc">&nbsp;                propriedade.setFreguesia(partes[7]);</b>
+<b class="fc">&nbsp;                propriedade.setMunicipio(partes[8]);</b>
+<b class="fc">&nbsp;                propriedade.setIlha(partes[9]);</b>
+&nbsp;
+<b class="fc">&nbsp;                propriedades.add(propriedade); // Adiciona a propriedade à lista</b>
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            e.printStackTrace();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return propriedades;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-18 23:17</div>
+</div>
+</body>
+</html>

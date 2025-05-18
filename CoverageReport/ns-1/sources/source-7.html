@@ -1,0 +1,402 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PropriedadeRustica</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">iscteiul.ista</a>
+</div>
+
+<h1>Coverage Summary for Class: PropriedadeRustica (iscteiul.ista)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PropriedadeRustica</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.2%
+  </span>
+  <span class="absValue">
+    (25/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (10/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.4%
+  </span>
+  <span class="absValue">
+    (37/38)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package iscteiul.ista;
+&nbsp;
+&nbsp;import org.locationtech.jts.geom.Geometry;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import static iscteiul.ista.SugestaoTrocas.calcularDistancia;
+&nbsp;
+&nbsp;/**
+&nbsp; * Representa uma propriedade rústica com informações como ID, área, coordenadas e localização.
+&nbsp; */
+<b class="fc">&nbsp;public class PropriedadeRustica {</b>
+&nbsp;    private String objectId;
+&nbsp;    private String parId;
+&nbsp;    private double parNum;
+&nbsp;    private double shapeLength;
+&nbsp;    private double shapeArea;
+&nbsp;    private String geometry;
+&nbsp;    private int owner;
+&nbsp;    private String freguesia;
+&nbsp;    private String municipio;
+&nbsp;    private String ilha;
+&nbsp;    private Geometry geometryObj;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Devolve a geometria em WKT.
+&nbsp;     *
+&nbsp;     * @return string WKT da geometria da parcela
+&nbsp;     */
+&nbsp;    public Geometry getGeometryObj() {
+<b class="fc">&nbsp;        return geometryObj;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Define a geometria da parcela.
+&nbsp;     *
+&nbsp;     * @param geometryObj string WKT a associar
+&nbsp;     */
+&nbsp;    public void setGeometryObj(Geometry geometryObj) {
+<b class="fc">&nbsp;        this.geometryObj = geometryObj;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Define o ID único da propriedade.
+&nbsp;     *
+&nbsp;     * @param objectId ID da propriedade.
+&nbsp;     */
+&nbsp;    public void setObjectId(String objectId) {
+<b class="fc">&nbsp;        this.objectId = objectId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Define o ID de PAR.
+&nbsp;     *
+&nbsp;     * @param parId ID de PAR.
+&nbsp;     */
+&nbsp;    public void setParId(String parId) {
+<b class="fc">&nbsp;        this.parId = parId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Define o número de PAR.
+&nbsp;     *
+&nbsp;     * @param parNum Número de PAR.
+&nbsp;     */
+&nbsp;    public void setParNum(double parNum) {
+<b class="fc">&nbsp;        this.parNum = parNum;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Define o comprimento da propriedade.
+&nbsp;     *
+&nbsp;     * @param shapeLength Comprimento da propriedade.
+&nbsp;     */
+&nbsp;    public void setShapeLength(double shapeLength) {
+<b class="fc">&nbsp;        this.shapeLength = shapeLength;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Define a área da propriedade.
+&nbsp;     *
+&nbsp;     * @param shapeArea Área da propriedade.
+&nbsp;     */
+&nbsp;    public void setShapeArea(double shapeArea) {
+<b class="fc">&nbsp;        this.shapeArea = shapeArea;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Define a geometria (coordenadas) da propriedade.
+&nbsp;     *
+&nbsp;     * @param geometry Geometria (MULTIPOLYGON).
+&nbsp;     */
+&nbsp;    public void setGeometry(String geometry) {
+<b class="fc">&nbsp;        this.geometry = geometry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Define o proprietário da propriedade (ID do proprietário).
+&nbsp;     *
+&nbsp;     * @param owner ID do proprietário.
+&nbsp;     */
+&nbsp;    public void setOwner(int owner) {
+<b class="fc">&nbsp;        this.owner = owner;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Define a freguesia (bairro) onde a propriedade está localizada.
+&nbsp;     *
+&nbsp;     * @param freguesia Nome da freguesia.
+&nbsp;     */
+&nbsp;    public void setFreguesia(String freguesia) {
+<b class="fc">&nbsp;        this.freguesia = freguesia;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Define o município onde a propriedade está localizada.
+&nbsp;     *
+&nbsp;     * @param municipio Nome do município.
+&nbsp;     */
+&nbsp;    public void setMunicipio(String municipio) {
+<b class="fc">&nbsp;        this.municipio = municipio;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Define a ilha onde a propriedade está localizada.
+&nbsp;     *
+&nbsp;     * @param ilha Nome da ilha.
+&nbsp;     */
+&nbsp;    public void setIlha(String ilha) {
+<b class="fc">&nbsp;        this.ilha = ilha;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retorna o ID único da propriedade.
+&nbsp;     *
+&nbsp;     * @return ID da propriedade.
+&nbsp;     */
+&nbsp;    public String getObjectId() {
+<b class="fc">&nbsp;        return objectId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retorna o ID de PAR.
+&nbsp;     *
+&nbsp;     * @return ID de PAR.
+&nbsp;     */
+&nbsp;    public String getParId() {
+<b class="fc">&nbsp;        return parId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retorna o número de PAR.
+&nbsp;     *
+&nbsp;     * @return Número de PAR.
+&nbsp;     */
+&nbsp;    public double getParNum() {
+<b class="fc">&nbsp;        return parNum;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retorna o comprimento da propriedade.
+&nbsp;     *
+&nbsp;     * @return Comprimento da propriedade.
+&nbsp;     */
+&nbsp;    public double getShapeLength() {
+<b class="fc">&nbsp;        return shapeLength;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retorna a área da propriedade.
+&nbsp;     *
+&nbsp;     * @return Área da propriedade.
+&nbsp;     */
+&nbsp;    public double getShapeArea() {
+<b class="fc">&nbsp;        return shapeArea;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retorna a geometria da propriedade.
+&nbsp;     *
+&nbsp;     * @return Geometria da propriedade (MULTIPOLYGON).
+&nbsp;     */
+&nbsp;    public String getGeometry() {
+<b class="fc">&nbsp;        return geometry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retorna o ID do proprietário da propriedade.
+&nbsp;     *
+&nbsp;     * @return ID do proprietário.
+&nbsp;     */
+&nbsp;    public int getOwner() {
+<b class="fc">&nbsp;        return owner;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retorna o nome da freguesia onde a propriedade está localizada.
+&nbsp;     *
+&nbsp;     * @return Nome da freguesia.
+&nbsp;     */
+&nbsp;    public String getFreguesia() {
+<b class="fc">&nbsp;        return freguesia;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retorna o nome do município onde a propriedade está localizada.
+&nbsp;     *
+&nbsp;     * @return Nome do município.
+&nbsp;     */
+&nbsp;    public String getMunicipio() {
+<b class="fc">&nbsp;        return municipio;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retorna o nome da ilha onde a propriedade está localizada.
+&nbsp;     *
+&nbsp;     * @return Nome da ilha.
+&nbsp;     */
+&nbsp;    public String getIlha() {
+<b class="fc">&nbsp;        return ilha;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retorna uma representação em formato String dos dados da propriedade rústica.
+&nbsp;     *
+&nbsp;     * @return Representação da propriedade.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;PropriedadeRustica{&quot; +</b>
+&nbsp;                &quot;objectId=&#39;&quot; + objectId + &#39;\&#39;&#39; +
+&nbsp;                &quot;, parId=&#39;&quot; + parId + &#39;\&#39;&#39; +
+&nbsp;                &quot;, parNum=&quot; + parNum +
+&nbsp;                &quot;, shapeLength=&quot; + shapeLength +
+&nbsp;                &quot;, shapeArea=&quot; + shapeArea +
+&nbsp;                &quot;, geometry=&#39;&quot; + geometry + &#39;\&#39;&#39; +
+&nbsp;                &quot;, owner=&quot; + owner +
+&nbsp;                &quot;, freguesia=&#39;&quot; + freguesia + &#39;\&#39;&#39; +
+&nbsp;                &quot;, municipio=&#39;&quot; + municipio + &#39;\&#39;&#39; +
+&nbsp;                &quot;, ilha=&#39;&quot; + ilha + &#39;\&#39;&#39; +
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Devolve o índice de compacidade calculado.
+&nbsp;     *
+&nbsp;     * @return valor do índice de compacidade
+&nbsp;     */
+&nbsp;    public double getIndiceCompacidade() {
+<b class="fc">&nbsp;        if (this.getGeometryObj() == null) return 0;</b>
+<b class="fc">&nbsp;        double area = this.getGeometryObj().getArea();</b>
+<b class="fc">&nbsp;        double perimetro = this.getGeometryObj().getLength();</b>
+<b class="pc">&nbsp;        if (area == 0) return 0;</b>
+<b class="fc">&nbsp;        return (4 * Math.PI * area) / (perimetro * perimetro);  // valor ≈ 1 se for um círculo</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Avalia o &quot;valor&quot; de uma propriedade com base na distância aos principais municípios e na compacidade.
+&nbsp;     *
+&nbsp;     * @param propriedade Propriedade a avaliar
+&nbsp;     * @param municipios Lista dos 3 principais municípios
+&nbsp;
+&nbsp;     * @return Score de valor da propriedade
+&nbsp;     */
+&nbsp;    public static double avaliarPropriedade(PropriedadeRustica propriedade, List&lt;Municipio&gt; municipios) {
+<b class="fc">&nbsp;        if (propriedade.getGeometryObj() == null || municipios.isEmpty()) return 0;</b>
+&nbsp;
+<b class="fc">&nbsp;        double menorDist = Double.MAX_VALUE;</b>
+<b class="fc">&nbsp;        for (Municipio m : municipios) {</b>
+<b class="fc">&nbsp;            double dist = calcularDistancia(propriedade, m);</b>
+<b class="pc">&nbsp;            if (dist &lt; menorDist) {</b>
+<b class="fc">&nbsp;                menorDist = dist;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        double scoreDistancia = 1.0 / (menorDist + 0.0001); // evitar divisão por 0</b>
+&nbsp;
+<b class="fc">&nbsp;        double compacidade = propriedade.getIndiceCompacidade(); // assumido ∈ [0,1]</b>
+&nbsp;
+<b class="fc">&nbsp;        return 0.55 * scoreDistancia + 0.45 * compacidade;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-18 23:17</div>
+</div>
+</body>
+</html>

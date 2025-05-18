@@ -1,0 +1,424 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SugestaoTrocas</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">iscteiul.ista</a>
+</div>
+
+<h1>Coverage Summary for Class: SugestaoTrocas (iscteiul.ista)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SugestaoTrocas</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (5/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    35.2%
+  </span>
+  <span class="absValue">
+    (19/54)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.8%
+  </span>
+  <span class="absValue">
+    (62/145)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package iscteiul.ista;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;import org.locationtech.jts.geom.Coordinate;
+&nbsp;
+&nbsp;import javax.swing.*;
+&nbsp;import java.awt.*;
+&nbsp;import java.io.*;
+&nbsp;import java.util.*;
+&nbsp;import java.util.List;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;import java.util.concurrent.ExecutorService;
+&nbsp;import java.util.concurrent.Executors;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;
+&nbsp;/**
+&nbsp; * Classe que sugere trocas de propriedades rústicas entre proprietários com base em critérios de
+&nbsp; * continuidade, área, compacidade e proximidade geográfica.
+&nbsp; */
+<b class="nc">&nbsp;public class SugestaoTrocas {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sugere trocas entre propriedades rústicas pertencentes a proprietários vizinhos no grafo de proprietários.
+&nbsp;     * A troca é sugerida se melhorar a média da área agrupada e preservar critérios de continuidade e área semelhante.
+&nbsp;     *
+&nbsp;     * @param propriedades Lista de propriedades rústicas a considerar.
+&nbsp;     * @param grafoProprietarios Grafo representando relações entre proprietários.
+&nbsp;     * @param grafoPropriedades Grafo representando relações entre propriedades (vizinhança).
+&nbsp;     * @return Lista de pares de propriedades sugeridas para troca.
+&nbsp;     */
+&nbsp;    public static List&lt;Pair&lt;PropriedadeRustica, PropriedadeRustica&gt;&gt; sugerirTrocas(
+&nbsp;            List&lt;PropriedadeRustica&gt; propriedades,
+&nbsp;            GrafoPropietarios grafoProprietarios,
+&nbsp;            GrafoPropriedades grafoPropriedades,
+&nbsp;            List&lt;Municipio&gt; tresMunicipios
+&nbsp;    ) {
+<b class="fc">&nbsp;        List&lt;Pair&lt;PropriedadeRustica, PropriedadeRustica&gt;&gt; trocasSugeridas = Collections.synchronizedList(new ArrayList&lt;&gt;());</b>
+<b class="fc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="fc">&nbsp;        Map&lt;Integer, List&lt;PropriedadeRustica&gt;&gt; mapaPorDono = propriedades.stream()</b>
+<b class="fc">&nbsp;                .collect(Collectors.groupingBy(PropriedadeRustica::getOwner));</b>
+&nbsp;
+<b class="fc">&nbsp;        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());</b>
+<b class="fc">&nbsp;        List&lt;Callable&lt;Void&gt;&gt; tarefas = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        for (Integer donoA : mapaPorDono.keySet()) {</b>
+<b class="pc">&nbsp;            for (Integer vizinho : grafoProprietarios.getVizinhos(donoA)) {</b>
+<b class="nc">&nbsp;                if (donoA &gt;= vizinho) continue;</b>
+&nbsp;
+<b class="nc">&nbsp;                List&lt;PropriedadeRustica&gt; terrasA = mapaPorDono.get(donoA);</b>
+<b class="nc">&nbsp;                List&lt;PropriedadeRustica&gt; terrasB = mapaPorDono.get(vizinho);</b>
+&nbsp;
+<b class="nc">&nbsp;                tarefas.add(() -&gt; {</b>
+<b class="nc">&nbsp;                    for (PropriedadeRustica a : terrasA) {</b>
+<b class="nc">&nbsp;                        for (PropriedadeRustica b : terrasB) {</b>
+&nbsp;
+<b class="nc">&nbsp;                            double valorA = PropriedadeRustica.avaliarPropriedade(a, tresMunicipios);</b>
+<b class="nc">&nbsp;                            double valorB = PropriedadeRustica.avaliarPropriedade(b, tresMunicipios);</b>
+<b class="nc">&nbsp;                            double diffRelativa = Math.abs(valorA - valorB) / ((valorA + valorB) / 2.0);</b>
+<b class="nc">&nbsp;                            boolean valoresSemelhantes = diffRelativa &lt;= 0.05;</b>
+&nbsp;
+<b class="nc">&nbsp;                            List&lt;PropriedadeRustica&gt; novasTerrasA = new ArrayList&lt;&gt;(terrasA);</b>
+<b class="nc">&nbsp;                            List&lt;PropriedadeRustica&gt; novasTerrasB = new ArrayList&lt;&gt;(terrasB);</b>
+<b class="nc">&nbsp;                            novasTerrasA.remove(a);</b>
+<b class="nc">&nbsp;                            novasTerrasB.remove(b);</b>
+&nbsp;
+<b class="nc">&nbsp;                            b.setOwner(donoA);</b>
+<b class="nc">&nbsp;                            a.setOwner(vizinho);</b>
+<b class="nc">&nbsp;                            novasTerrasA.add(b);</b>
+<b class="nc">&nbsp;                            novasTerrasB.add(a);</b>
+&nbsp;
+<b class="nc">&nbsp;                            double mediaAntesA = calcularMediaComFusaoIndividual(terrasA, grafoPropriedades);</b>
+<b class="nc">&nbsp;                            double mediaAntesB = calcularMediaComFusaoIndividual(terrasB, grafoPropriedades);</b>
+<b class="nc">&nbsp;                            double mediaDepoisA = calcularMediaComFusaoIndividual(novasTerrasA, grafoPropriedades);</b>
+<b class="nc">&nbsp;                            double mediaDepoisB = calcularMediaComFusaoIndividual(novasTerrasB, grafoPropriedades);</b>
+&nbsp;
+<b class="nc">&nbsp;                            a.setOwner(donoA);</b>
+<b class="nc">&nbsp;                            b.setOwner(vizinho);</b>
+&nbsp;
+<b class="nc">&nbsp;                            boolean conectaA = conectaGrupoVizinho(b, terrasA, grafoPropriedades);</b>
+<b class="nc">&nbsp;                            boolean conectaB = conectaGrupoVizinho(a, terrasB, grafoPropriedades);</b>
+<b class="nc">&nbsp;                            boolean melhoraContinuidade = conectaA || conectaB;</b>
+&nbsp;
+<b class="nc">&nbsp;                            if (mediaDepoisA &gt; mediaAntesA &amp;&amp; mediaDepoisB &gt; mediaAntesB) {</b>
+<b class="nc">&nbsp;                                double areaDiff = Math.abs(a.getShapeArea() - b.getShapeArea());</b>
+<b class="nc">&nbsp;                                double areaMedia = (a.getShapeArea() + b.getShapeArea()) / 2.0;</b>
+<b class="nc">&nbsp;                                double percentualDiferenca = areaDiff / areaMedia;</b>
+&nbsp;
+<b class="nc">&nbsp;                                if (percentualDiferenca &lt; 0.2 &amp;&amp; melhoraContinuidade) {</b>
+<b class="nc">&nbsp;                                    synchronized (trocasSugeridas) {</b>
+<b class="nc">&nbsp;                                        trocasSugeridas.add(new Pair&lt;&gt;(a, b));</b>
+<b class="nc">&nbsp;                                    }</b>
+<b class="nc">&nbsp;                                    synchronized (sb) {</b>
+<b class="nc">&nbsp;                                        sb.append(String.format(</b>
+&nbsp;                                                &quot;\n🔁 Trocar propriedade %s (dono %d, área %.2f m²) ↔ propriedade %s (dono %d, área %.2f m²)\n&quot;,
+<b class="nc">&nbsp;                                                a.getObjectId(), donoA, a.getShapeArea(),</b>
+<b class="nc">&nbsp;                                                b.getObjectId(), vizinho, b.getShapeArea()</b>
+&nbsp;                                        ));
+<b class="nc">&nbsp;                                        sb.append(String.format(&quot;   📈 Média dono %d: antes = %.2f m², depois = %.2f m²\n&quot;, donoA, mediaAntesA, mediaDepoisA));</b>
+<b class="nc">&nbsp;                                        sb.append(String.format(&quot;   📈 Média dono %d: antes = %.2f m², depois = %.2f m²\n&quot;, vizinho, mediaAntesB, mediaDepoisB));</b>
+<b class="nc">&nbsp;                                    }</b>
+&nbsp;                                }
+<b class="nc">&nbsp;                            } else if (melhoraContinuidade &amp;&amp; valoresSemelhantes) {</b>
+<b class="nc">&nbsp;                                synchronized (trocasSugeridas) {</b>
+<b class="nc">&nbsp;                                    trocasSugeridas.add(new Pair&lt;&gt;(a, b));</b>
+<b class="nc">&nbsp;                                }</b>
+&nbsp;
+<b class="nc">&nbsp;                                double ganhoValorA = ((valorB - valorA) / valorA) * 100;</b>
+<b class="nc">&nbsp;                                double ganhoValorB = ((valorA - valorB) / valorB) * 100;</b>
+&nbsp;
+<b class="nc">&nbsp;                                synchronized (sb) {</b>
+<b class="nc">&nbsp;                                    sb.append(String.format(</b>
+&nbsp;                                            &quot;\n🔁 Trocar propriedade %s (dono %d, avaliação %.2f) ↔ propriedade %s (dono %d, avaliação %.2f)\n&quot;,
+<b class="nc">&nbsp;                                            a.getObjectId(), donoA, valorA,</b>
+<b class="nc">&nbsp;                                            b.getObjectId(), vizinho, valorB</b>
+&nbsp;                                    ));
+<b class="nc">&nbsp;                                    sb.append(String.format(&quot;   💰 Valor dono %d: %.2f ↔ %.2f (diferença = %.2f%%)\n&quot;, donoA, valorA, valorB, ganhoValorA));</b>
+<b class="nc">&nbsp;                                    sb.append(String.format(&quot;   💰 Valor dono %d: %.2f ↔ %.2f (diferença = %.2f%%)\n&quot;, vizinho, valorB, valorA, ganhoValorB));</b>
+<b class="nc">&nbsp;                                }</b>
+&nbsp;                            }
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                    return null;</b>
+&nbsp;                });
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            executor.invokeAll(tarefas);</b>
+&nbsp;        } catch (InterruptedException e) {
+<b class="nc">&nbsp;            e.printStackTrace();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        executor.shutdown();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (sb.isEmpty()) {</b>
+<b class="fc">&nbsp;            sb.append(&quot;⚠️ Nenhuma troca sugerida.&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Mostrar janela Swing
+<b class="fc">&nbsp;        JTextArea textArea = new JTextArea(sb.toString());</b>
+<b class="fc">&nbsp;        textArea.setEditable(false);</b>
+<b class="fc">&nbsp;        textArea.setCaretPosition(0);</b>
+<b class="fc">&nbsp;        JScrollPane scrollPane = new JScrollPane(textArea);</b>
+<b class="fc">&nbsp;        scrollPane.setPreferredSize(new Dimension(800, 600));</b>
+&nbsp;
+<b class="fc">&nbsp;        JFrame frame = new JFrame(&quot;Sugestões de Troca&quot;);</b>
+<b class="fc">&nbsp;        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);</b>
+<b class="fc">&nbsp;        frame.getContentPane().add(scrollPane);</b>
+<b class="fc">&nbsp;        frame.pack();</b>
+<b class="fc">&nbsp;        frame.setLocationRelativeTo(null);</b>
+<b class="fc">&nbsp;        frame.setVisible(true);</b>
+&nbsp;
+<b class="fc">&nbsp;        return trocasSugeridas;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calcula a média das áreas agrupadas das propriedades de um proprietário,
+&nbsp;     * considerando grupos conectados pelo grafo de propriedades.
+&nbsp;     *
+&nbsp;     * @param propriedades Propriedades do mesmo proprietário.
+&nbsp;     * @param grafo Grafo que define a vizinhança entre propriedades.
+&nbsp;     * @return Média das áreas dos grupos conectados das propriedades.
+&nbsp;     */
+&nbsp;    public static double calcularMediaComFusaoIndividual(List&lt;PropriedadeRustica&gt; propriedades, GrafoPropriedades grafo) {
+<b class="fc">&nbsp;        Set&lt;PropriedadeRustica&gt; visitadas = new HashSet&lt;&gt;();</b>
+<b class="fc">&nbsp;        List&lt;Double&gt; areasAgrupadas = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        for (PropriedadeRustica p : propriedades) {</b>
+<b class="fc">&nbsp;            if (!visitadas.contains(p)) {</b>
+<b class="fc">&nbsp;                double areaGrupo = 0;</b>
+<b class="fc">&nbsp;                Queue&lt;PropriedadeRustica&gt; fila = new LinkedList&lt;&gt;();</b>
+<b class="fc">&nbsp;                fila.add(p);</b>
+<b class="fc">&nbsp;                visitadas.add(p);</b>
+&nbsp;
+<b class="fc">&nbsp;                while (!fila.isEmpty()) {</b>
+<b class="fc">&nbsp;                    PropriedadeRustica atual = fila.poll();</b>
+<b class="fc">&nbsp;                    areaGrupo += atual.getShapeArea();</b>
+&nbsp;
+<b class="fc">&nbsp;                    for (PropriedadeRustica vizinha : grafo.getGrafo().getOrDefault(atual, Set.of())) {</b>
+<b class="fc">&nbsp;                        if (!visitadas.contains(vizinha)</b>
+<b class="pc">&nbsp;                                &amp;&amp; vizinha.getOwner() == atual.getOwner()</b>
+<b class="pc">&nbsp;                                &amp;&amp; propriedades.contains(vizinha)) {</b>
+<b class="fc">&nbsp;                            fila.add(vizinha);</b>
+<b class="fc">&nbsp;                            visitadas.add(vizinha);</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+<b class="fc">&nbsp;                areasAgrupadas.add(areaGrupo);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return areasAgrupadas.stream().mapToDouble(Double::doubleValue).average().orElse(0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Verifica se uma nova propriedade conecta-se a algum grupo de propriedades já existentes
+&nbsp;     * do mesmo proprietário no grafo.
+&nbsp;     *
+&nbsp;     * @param novaProp Nova propriedade a ser conectada.
+&nbsp;     * @param outrasDoMesmoDono Lista de outras propriedades do mesmo proprietário.
+&nbsp;     * @param grafo Grafo que representa vizinhança entre propriedades.
+&nbsp;     * @return true se conecta a pelo menos uma propriedade do grupo, false caso contrário.
+&nbsp;     */
+&nbsp;    public static boolean conectaGrupoVizinho(PropriedadeRustica novaProp,
+&nbsp;                                              List&lt;PropriedadeRustica&gt; outrasDoMesmoDono,
+&nbsp;                                              GrafoPropriedades grafo) {
+<b class="pc">&nbsp;        for (PropriedadeRustica outra : outrasDoMesmoDono) {</b>
+<b class="pc">&nbsp;            if (grafo.getGrafo().getOrDefault(novaProp, Set.of()).contains(outra)) {</b>
+<b class="fc">&nbsp;                return true; // conecta-se a alguma já existente</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Lê informações de municípios a partir de um ficheiro CSV e retorna os três municípios com maior população.
+&nbsp;     * O ficheiro deve estar no formato: nome;população;longitude;latitude
+&nbsp;     *
+&nbsp;     * @param fileName Caminho para o ficheiro CSV.
+&nbsp;     * @return Lista com os três municípios mais populosos.
+&nbsp;     */
+&nbsp;    public static List&lt;Municipio&gt; tresMaioresMunicipios(String fileName) {
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Municipio&gt; municipios = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        try (InputStream is = SugestaoTrocas.class.getClassLoader().getResourceAsStream(fileName);</b>
+<b class="nc">&nbsp;             BufferedReader br = new BufferedReader(new InputStreamReader(is))) {</b>
+&nbsp;
+<b class="nc">&nbsp;            if (is == null) {</b>
+<b class="nc">&nbsp;                System.err.println(&quot;Ficheiro &quot; + fileName + &quot; não encontrado no classpath.&quot;);</b>
+<b class="nc">&nbsp;                return Collections.emptyList();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            String linha = br.readLine(); // ler cabeçalho</b>
+<b class="nc">&nbsp;            while ((linha = br.readLine()) != null) {</b>
+<b class="nc">&nbsp;                String[] partes = linha.split(&quot;;&quot;);</b>
+<b class="nc">&nbsp;                String nome = partes[0].trim();</b>
+<b class="nc">&nbsp;                int populacao = Integer.parseInt(partes[1].trim());</b>
+<b class="nc">&nbsp;                Coordinate coord = new Coordinate(Double.parseDouble(partes[2].trim()), Double.parseDouble(partes[3].trim()));</b>
+<b class="nc">&nbsp;                municipios.add(new Municipio(nome, populacao, coord));</b>
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            System.err.println(&quot;Erro a ler o ficheiro: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;
+&nbsp;        // Ordenar por população decrescente e obter os 3 primeiros
+<b class="nc">&nbsp;        List&lt;Municipio&gt; top3 = municipios.stream()</b>
+<b class="nc">&nbsp;                .sorted(Comparator.comparingInt(Municipio::getPopulacao).reversed())</b>
+<b class="nc">&nbsp;                .limit(3)</b>
+<b class="nc">&nbsp;                .collect(Collectors.toList());</b>
+&nbsp;
+<b class="nc">&nbsp;        System.out.println(&quot;Top 3 municípios com maior população:&quot;);</b>
+<b class="nc">&nbsp;        for (Municipio m : top3) {</b>
+<b class="nc">&nbsp;            System.out.printf(&quot;- %s (%d habitantes)%n&quot;, m.getNome(), m.getPopulacao());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return municipios;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calcula a distância, em metros, entre o centroide da propriedade rústica e o centro do município.
+&nbsp;     *
+&nbsp;     * @param propriedade Propriedade rústica cuja distância será calculada.
+&nbsp;     * @param municipio Município de referência.
+&nbsp;     * @return Distância em metros; retorna -1 se a geometria da propriedade não estiver definida.
+&nbsp;     */
+&nbsp;    public static double calcularDistancia(PropriedadeRustica propriedade, Municipio municipio) {
+<b class="pc">&nbsp;        if (propriedade.getGeometryObj() == null) {</b>
+<b class="nc">&nbsp;            System.err.println(&quot;Geometria da propriedade não está definida.&quot;);</b>
+<b class="nc">&nbsp;            return -1;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Coordinate centroide = propriedade.getGeometryObj().getCentroid().getCoordinate();</b>
+<b class="fc">&nbsp;        Coordinate cidade = municipio.getCoordenadas();</b>
+<b class="fc">&nbsp;        return distancia(centroide, cidade);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calcula a distância haversine entre duas coordenadas geográficas.
+&nbsp;     *
+&nbsp;     * @param c1 Primeira coordenada (longitude, latitude).
+&nbsp;     * @param c2 Segunda coordenada (longitude, latitude).
+&nbsp;     * @return Distância em metros entre as duas coordenadas.
+&nbsp;     */
+&nbsp;    public static double distancia(Coordinate c1, Coordinate c2) {
+<b class="fc">&nbsp;        double R = 6371000; // raio da Terra em metros</b>
+<b class="fc">&nbsp;        double lat1 = Math.toRadians(c1.y);</b>
+<b class="fc">&nbsp;        double lon1 = Math.toRadians(c1.x);</b>
+<b class="fc">&nbsp;        double lat2 = Math.toRadians(c2.y);</b>
+<b class="fc">&nbsp;        double lon2 = Math.toRadians(c2.x);</b>
+&nbsp;
+<b class="fc">&nbsp;        double dlat = lat2 - lat1;</b>
+<b class="fc">&nbsp;        double dlon = lon2 - lon1;</b>
+&nbsp;
+<b class="fc">&nbsp;        double a = Math.sin(dlat / 2) * Math.sin(dlat / 2)</b>
+<b class="fc">&nbsp;                + Math.cos(lat1) * Math.cos(lat2)</b>
+<b class="fc">&nbsp;                * Math.sin(dlon / 2) * Math.sin(dlon / 2);</b>
+&nbsp;
+<b class="fc">&nbsp;        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));</b>
+<b class="fc">&nbsp;        return R * c;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-18 23:17</div>
+</div>
+</body>
+</html>

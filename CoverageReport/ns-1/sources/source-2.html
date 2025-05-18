@@ -1,0 +1,224 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GrafoPropietarios</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">iscteiul.ista</a>
+</div>
+
+<h1>Coverage Summary for Class: GrafoPropietarios (iscteiul.ista)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GrafoPropietarios</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (5/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (2/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (8/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package iscteiul.ista;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;
+&nbsp;import java.util.*;
+&nbsp;
+&nbsp;/**
+&nbsp; * Classe que representa um grafo de proprietários, onde os nós são identificadores de proprietários
+&nbsp; * e as arestas representam vizinhança (propriedades adjacentes) entre propriedades de diferentes donos.
+&nbsp; */
+&nbsp;public class GrafoPropietarios {
+&nbsp;
+&nbsp;    /** Mapa que representa o grafo: cada proprietário está associado a um conjunto de proprietários vizinhos */
+&nbsp;    private final Map&lt;Integer, Set&lt;Integer&gt;&gt; grafo;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Construtor da classe, inicializa o grafo vazio.
+&nbsp;     */
+<b class="fc">&nbsp;    public GrafoPropietarios() {</b>
+<b class="fc">&nbsp;        this.grafo = new HashMap&lt;&gt;();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adiciona um proprietário ao grafo, se ainda não estiver presente.
+&nbsp;     *
+&nbsp;     * @param owner ID do proprietário.
+&nbsp;     */
+&nbsp;    public void adicionarProprietario(int owner) {
+<b class="fc">&nbsp;        grafo.putIfAbsent(owner, new HashSet&lt;&gt;());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adiciona uma relação de vizinhança (aresta) entre dois proprietários distintos.
+&nbsp;     *
+&nbsp;     * @param owner1 ID do primeiro proprietário.
+&nbsp;     * @param owner2 ID do segundo proprietário.
+&nbsp;     */
+&nbsp;    public void adicionarVizinhanca(int owner1, int owner2) {
+<b class="fc">&nbsp;        if (owner1 != owner2) {</b>
+<b class="fc">&nbsp;            grafo.get(owner1).add(owner2);</b>
+<b class="fc">&nbsp;            grafo.get(owner2).add(owner1);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtém o conjunto de IDs de proprietários vizinhos de um determinado proprietário.
+&nbsp;     *
+&nbsp;     * @param owner ID do proprietário.
+&nbsp;     * @return Conjunto de IDs dos vizinhos, ou conjunto vazio se não tiver vizinhos.
+&nbsp;     */
+&nbsp;    public Set&lt;Integer&gt; getVizinhos(int owner) {
+<b class="fc">&nbsp;        return grafo.getOrDefault(owner, new HashSet&lt;&gt;());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtém o mapa completo que representa o grafo dos proprietários.
+&nbsp;     *
+&nbsp;     * @return Mapa do grafo com vizinhanças.
+&nbsp;     */
+&nbsp;    public Map&lt;Integer, Set&lt;Integer&gt;&gt; getGrafo() {
+<b class="fc">&nbsp;        return this.grafo;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Exibe na consola o grafo dos proprietários, mostrando cada proprietário e os seus vizinhos.
+&nbsp;     */
+&nbsp;    public void exibirGrafo() {
+<b class="nc">&nbsp;        System.out.println(&quot;Grafo de Proprietários Vizinhos:&quot;);</b>
+<b class="nc">&nbsp;        for (Map.Entry&lt;Integer, Set&lt;Integer&gt;&gt; entry : grafo.entrySet()) {</b>
+<b class="nc">&nbsp;            System.out.println(&quot;Proprietário: &quot; + entry.getKey() + &quot; -&gt; Vizinhos: &quot; + entry.getValue());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constrói o grafo de proprietários com base numa lista de propriedades,
+&nbsp;     * adicionando arestas entre proprietários de propriedades adjacentes.
+&nbsp;     *
+&nbsp;     * @param propriedades Lista de propriedades rústicas.
+&nbsp;     * @param grafoPropriedades Grafo das Propriedades
+&nbsp;     *
+&nbsp;     */
+&nbsp;    public void construirGrafoProprietarios(GrafoPropriedades grafoPropriedades, List&lt;PropriedadeRustica&gt; propriedades) {
+&nbsp;
+<b class="nc">&nbsp;        for (PropriedadeRustica propriedade : propriedades) {</b>
+<b class="nc">&nbsp;            this.adicionarProprietario(propriedade.getOwner());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;PropriedadeRustica, Set&lt;PropriedadeRustica&gt;&gt; mapaAdj = grafoPropriedades.getGrafo();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (PropriedadeRustica propriedade : mapaAdj.keySet()) {</b>
+<b class="nc">&nbsp;            int donoA = propriedade.getOwner();</b>
+&nbsp;
+<b class="nc">&nbsp;            for (PropriedadeRustica vizinha : mapaAdj.get(propriedade)) {</b>
+<b class="nc">&nbsp;                int donoB = vizinha.getOwner();</b>
+&nbsp;
+&nbsp;                // Adiciona adjacência entre donos se forem diferentes
+<b class="nc">&nbsp;                if (donoA!=donoB) {</b>
+<b class="nc">&nbsp;                    this.adicionarVizinhanca(donoA, donoB);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-18 23:17</div>
+</div>
+</body>
+</html>

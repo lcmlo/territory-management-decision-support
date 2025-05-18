@@ -1,0 +1,170 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Municipio</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">iscteiul.ista</a>
+</div>
+
+<h1>Coverage Summary for Class: Municipio (iscteiul.ista)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Municipio</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package iscteiul.ista;
+&nbsp;
+&nbsp;import org.locationtech.jts.geom.Coordinate;
+&nbsp;
+&nbsp;
+&nbsp;/**
+&nbsp; * Representa um município com nome, população e localização geográfica.
+&nbsp; */
+&nbsp;public class Municipio {
+&nbsp;    /**
+&nbsp;     * Nome do município.
+&nbsp;     */
+&nbsp;    private final String nome;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * População do município.
+&nbsp;     */
+&nbsp;    private final int populacao;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Coordenadas geográficas do município.
+&nbsp;     */
+&nbsp;    private Coordinate coordenadas;
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Construtor para criar um município com nome, população e coordenadas.
+&nbsp;     *
+&nbsp;     * @param nome Nome do município
+&nbsp;     * @param populacao Número de habitantes do município
+&nbsp;     * @param coordenadas Coordenadas geográficas do município
+&nbsp;     */
+<b class="fc">&nbsp;    public Municipio(String nome, int populacao, Coordinate coordenadas) {</b>
+<b class="fc">&nbsp;        this.nome = nome;</b>
+<b class="fc">&nbsp;        this.populacao = populacao;</b>
+<b class="fc">&nbsp;        this.coordenadas = coordenadas;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtém o nome do município.
+&nbsp;     *
+&nbsp;     * @return nome do município
+&nbsp;     */
+&nbsp;    public String getNome() {
+<b class="fc">&nbsp;        return nome;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtém a população do município.
+&nbsp;     *
+&nbsp;     * @return população do município
+&nbsp;     */
+&nbsp;    public int getPopulacao() {
+<b class="fc">&nbsp;        return populacao;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtém as coordenadas geográficas do município.
+&nbsp;     *
+&nbsp;     * @return coordenadas do município
+&nbsp;     */
+&nbsp;    public Coordinate getCoordenadas() {
+<b class="fc">&nbsp;        return coordenadas;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-18 23:17</div>
+</div>
+</body>
+</html>
