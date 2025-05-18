@@ -2,6 +2,10 @@ package iscteiul.ista;
 
 import org.locationtech.jts.geom.Geometry;
 
+import java.util.List;
+
+import static iscteiul.ista.SugestaoTrocas.calcularDistancia;
+
 /**
  * Representa uma propriedade rústica com informações como ID, área, coordenadas e localização.
  */
@@ -237,5 +241,31 @@ public class PropriedadeRustica {
         double perimetro = this.getGeometryObj().getLength();
         if (area == 0) return 0;
         return (4 * Math.PI * area) / (perimetro * perimetro);  // valor ≈ 1 se for um círculo
+    }
+
+    /**
+     * Avalia o "valor" de uma propriedade com base na distância aos principais municípios e na compacidade.
+     *
+     * @param propriedade Propriedade a avaliar
+     * @param municipios Lista dos 3 principais municípios
+
+     * @return Score de valor da propriedade
+     */
+    public static double avaliarPropriedade(PropriedadeRustica propriedade, List<Municipio> municipios) {
+        if (propriedade.getGeometryObj() == null || municipios.isEmpty()) return 0;
+
+        double menorDist = Double.MAX_VALUE;
+        for (Municipio m : municipios) {
+            double dist = calcularDistancia(propriedade, m);
+            if (dist < menorDist) {
+                menorDist = dist;
+            }
+        }
+
+        double scoreDistancia = 1.0 / (menorDist + 0.0001); // evitar divisão por 0
+
+        double compacidade = propriedade.getIndiceCompacidade(); // assumido ∈ [0,1]
+
+        return 0.55 * scoreDistancia + 0.45 * compacidade;
     }
 }

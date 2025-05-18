@@ -90,9 +90,8 @@ public class Main {
         CalculadoraArea.calcularAreaMediaPorZona(propriedades);
 
 
-        //teste 6
-
-        List<Pair<PropriedadeRustica, PropriedadeRustica>> trocas = SugestaoTrocas.sugerirTrocas(propriedades, grafoProprietarios, grafoVizinhanca);
+        List<Municipio> tresMunicipios = SugestaoTrocas.tresMaioresMunicipios("InfoMadeira.csv");
+        List<Pair<PropriedadeRustica, PropriedadeRustica>> trocas = SugestaoTrocas.sugerirTrocas(propriedades, grafoProprietarios, grafoVizinhanca,tresMunicipios);
     }
 
     /**
