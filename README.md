@@ -8,6 +8,9 @@ This project provides a decision-support application aimed at promoting a more b
 * Luis Lourenco (GitHub: lcmlo)
 * Pedro Li (GitHub: Pclin0620)
 
+![propriedades](https://github.com/user-attachments/assets/ea03cdd3-6f96-45b8-859a-015d0a88a703)
+
+
 ## Technologies Used
 * Language: Java 22
 * Build Tool: Apache Maven
@@ -43,4 +46,4 @@ The development lifecycle strictly followed the Scrum framework. Task allocation
 4. Open a terminal in the project's root directory and build the project:
    `mvn clean install`
 5. Run the main application:
-   `mvn exec:java -Dexec.mainClass="iscteiul.ista.Main"`
+   `mvn exec:java -Dexec.mainClass=iscteiul.ista.Main`
